@@ -1,19 +1,31 @@
 const fetch = require("node-fetch");
 
+
+const { getAuthToken, getSpreadSheetValues } = require('./googleSheetsService');
+require('dotenv').config();
+
+
+
+const { getAuthToken, getSpreadSheetValues } = require('./googleSheetsService');
+
 exports.handler = async (event, context) => {
-  const url = "https://icanhazdadjoke.com/";
   try {
-    const jokeStream = await fetch(url, {
-      headers: {
-        Accept: "application/json"
-      }
+    const auth = await getAuthToken();
+    const response = await getSpreadSheetValues({
+      spreadsheetId: "1SZwDpZO7rvLrijKq9dtgdOP4tffr-KzhQB1JsPXBj8I",
+      range: 'Overview!D5:F5', // Adjust the range as needed
+      auth
     });
-    const jsonJoke = await jokeStream.json();
+
     return {
       statusCode: 200,
-      body: JSON.stringify(jsonJoke)
+      body: JSON.stringify(response.data.values)
     };
-  } catch (err) {
-    return { statusCode: 422, body: err.stack };
+  } catch (error) {
+    console.error(error);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ msg: 'Error fetching data', error: error.message })
+    };
   }
 };
