@@ -17,9 +17,12 @@ exports.handler = async (event, context) => {
       auth
     });
 
+    const text =  json(response.data.values);
+
+
     return {
       statusCode: 200,
-      body: JSON.stringify(response.data.values)
+      body: text[0][0]
     };
   } catch (error) {
     console.error(error);
