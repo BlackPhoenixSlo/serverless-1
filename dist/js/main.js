@@ -9,7 +9,7 @@ const getRandomDadJoke = async () => {
   const jokeStream = await fetch(url);
   const jsonJoke = await jokeStream.json();
   console.log(jsonJoke)
-  const joke = jsonJoke.joke;
+  const joke = jsonJoke;
   return joke;
 };
 
