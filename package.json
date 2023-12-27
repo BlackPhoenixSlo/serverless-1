@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/BlackPhoenixSlo/serverless#readme",
   "dependencies": {
+    "googleapis": "^129.0.0",
     "node-fetch": "^2.6.1"
   }
 }
