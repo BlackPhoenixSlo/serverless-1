@@ -8,6 +8,7 @@ const getRandomDadJoke = async () => {
   const url = "/.netlify/functions/jokes";
   const jokeStream = await fetch(url);
   const jsonJoke = await jokeStream.json();
+  console.log(jsonJoke)
   const joke = jsonJoke.joke;
   return joke;
 };
