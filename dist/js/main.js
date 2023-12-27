@@ -13,10 +13,11 @@ const getRandomDadJoke = async () => {
   return joke;
 };
 
-const displayJoke = (joke) => {
+const displayJoke = (jokeObject) => {
   const h1 = document.querySelector("h1");
-  h1.textContent = joke;
+  h1.textContent = jokeObject.joke; // Accessing the 'joke' property of the joke object
 };
+
 
 const refreshJoke = async () => {
   const joke = await getRandomDadJoke();
