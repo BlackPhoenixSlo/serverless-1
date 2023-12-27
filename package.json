@@ -8,15 +8,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/gitdagray/serverless.git"
+    "url": "git+https://github.com/BlackPhoenixSlo/serverless.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/gitdagray/serverless/issues"
+    "url": "https://github.com/BlackPhoenixSlo/serverless/issues"
   },
-  "homepage": "https://github.com/gitdagray/serverless#readme",
+  "homepage": "https://github.com/BlackPhoenixSlo/serverless#readme",
   "dependencies": {
     "node-fetch": "^2.6.1"
   }
