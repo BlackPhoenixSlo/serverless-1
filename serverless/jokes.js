@@ -1,8 +1,10 @@
 const fetch = require("node-fetch");
+const fetch = require("node-fetch");
 
 
 const { getAuthToken, getSpreadSheetValues } = require('./googleSheetsService');
 require('dotenv').config();
+
 
 
 
@@ -24,7 +26,7 @@ exports.handler = async (event, context) => {
       statusCode: 200,
       body: JSON.stringify(response.data.values)
     };
-    
+
   } catch (error) {
     console.error(error);
     return {
