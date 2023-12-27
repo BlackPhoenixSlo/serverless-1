@@ -20,10 +20,7 @@ exports.handler = async (event, context) => {
     const text =  json(response.data.values);
 
 
-    return {
-      statusCode: 200,
-      body: text[0][0]
-    };
+    return text;
   } catch (error) {
     console.error(error);
     return {
