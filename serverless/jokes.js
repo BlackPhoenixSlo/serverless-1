@@ -1,8 +1,3 @@
-const fetch = require("node-fetch");
-const fetch = require("node-fetch");
-
-
-const { getAuthToken, getSpreadSheetValues } = require('./googleSheetsService');
 require('dotenv').config();
 
 
