@@ -1,28 +1,23 @@
-require('dotenv').config();
+const { main } = require('./index-runfromdesktop'); // Replace with your actual module path
 
 
-
-
-const { getAuthToken, getSpreadSheetValues } = require('./googleSheetsService');
-
-exports.handler = async (event, context) => {
+exports.handler = async (event) => {
   try {
-    const auth = await getAuthToken();
-    const response = await getSpreadSheetValues({
-      spreadsheetId: "1SZwDpZO7rvLrijKq9dtgdOP4tffr-KzhQB1JsPXBj8I",
-      range: 'Overview!D5:F5',
-      auth
-    });
+      // Extract parameters from the event object if needed
+      // const params = event.queryStringParameters;
 
-    return {
-      statusCode: 200,
-      body: JSON.stringify(response.data.values)
-    };
+      // Call your core functionality
+      const data = await main();
+
+      return {
+          statusCode: 200,
+          body: JSON.stringify(data)
+      };
   } catch (error) {
-    console.error(error);
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ msg: 'Error fetching data', error: error.message })
-    };
+      console.error('Error:', error);
+      return {
+          statusCode: 500,
+          body: JSON.stringify({ message: 'Internal Server Error' })
+      };
   }
 };
