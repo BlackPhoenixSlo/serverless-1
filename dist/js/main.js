@@ -1,5 +1,5 @@
 const fetchData = async () => {
-  const url = "/.netlify/functions/sheets";
+  const url = "/.netlify/functions/jokes";
   const response = await fetch(url);
   const data = await response.json();
   return data;
