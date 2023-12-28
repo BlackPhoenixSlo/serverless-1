@@ -1,8 +1,16 @@
-const fetchData = async () => {
+const getRandomDadJoke = async () => {
+  // const url = "https://icanhazdadjoke.com/";
+  // const jokeStream = await fetch(url, {
+  //   headers: {
+  //     Accept: "application/json"
+  //   }
+  // }); 
   const url = "/.netlify/functions/jokes";
-  const response = await fetch(url);
-  const data = await response.json();
-  return data;
+  const jokeStream = await fetch(url);
+  const jsonJoke = await jokeStream.json();
+  console.log(jsonJoke)
+  const joke = jsonJoke;
+  return joke;
 };
 
 const displayData = (data) => {
@@ -18,15 +26,16 @@ const displayData = (data) => {
 
 };
 
-const refreshData = async () => {
+const refreshJoke = async () => {
   document.querySelector('.bot-signal').textContent = "Bot signal: Loading." ;
   document.querySelector('.eth-position').textContent = "Eth position: Loading.. " ;
   document.querySelector('.total-profit').textContent = "Total profit: Loading...";
   const data = await fetchData();
   displayData(data);
+
 };
 
-// Load initial data
-refreshData();
+// load 1st joke
+refreshJoke();
 
-setInterval(refreshData, 10000);
+setInterval(refreshJoke, 10000);
