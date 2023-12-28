@@ -26,12 +26,13 @@ const displayData = (data) => {
 
 };
 
+
 const refreshJoke = async () => {
   document.querySelector('.bot-signal').textContent = "Bot signal: Loading." ;
   document.querySelector('.eth-position').textContent = "Eth position: Loading.. " ;
   document.querySelector('.total-profit').textContent = "Total profit: Loading...";
-  const data = await fetchData();
-  displayData(data);
+  const joke = await getRandomDadJoke();
+  displayData(joke);
 
 };
 
