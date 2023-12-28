@@ -6,9 +6,12 @@ const sheets = google.sheets('v4');
 const SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];
 
 async function getAuthToken() {
-  const auth = new google.auth.GoogleAuth({
-    scopes: SCOPES
-  });
+  const credentials = JSON.parse(process.env.GOOGLE_CREDENTIALS); // Assuming GOOGLE_CREDENTIALS contains the JSON key file content as a string
+
+const auth = new google.auth.GoogleAuth({
+  credentials: credentials,
+  scopes: ['https://www.googleapis.com/auth/spreadsheets']
+});
   const authToken = await auth.getClient();
   return authToken;
 }
