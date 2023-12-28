@@ -1,0 +1,204 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2638
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;\f1\fnil\fcharset0 AppleSymbols;\f2\fnil\fcharset134 PingFangSC-Regular;
+\f3\fnil\fcharset0 LucidaGrande;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 //@version=5\
+indicator("Volume Trend Tracker (VTT) [Algo Alert]", shorttitle = "
+\f1 \uc0\u10834 
+\f0  VTT [Algo Alert]", overlay = true, precision = 0)\
+neon = input.bool(title = 'Neon Color Theme', defval = true)\
+\
+green = neon ? #00ffbb : #008504\
+red = neon ? #ff1100 : #840000\
+\
+//ALMA Smoothing\
+sourceData = close\
+smoothingFactor = 1\
+lookbackPeriod = 15\
+offsetValue = 0.83\
+sigmaValue = 6\
+percentageChange = ta.change(sourceData, smoothingFactor) / sourceData * 100\
+almaS = ta.alma(percentageChange, lookbackPeriod, offsetValue, sigmaValue)\
+\
+\
+// VZO Calculation\
+vzoLength = 35\
+directionalVolume = math.sign(almaS - almaS[2]) * volume\
+emaDV = ta.ema(directionalVolume, vzoLength)\
+smaV = ta.sma(volume, vzoLength)\
+VZO_ = smaV != 0 ? 100 * emaDV / smaV : 0\
+\
+//Smoothness\
+smo = 7\
+VZO_ := ta.wma(VZO_, smo) \
+//\
+\
+\
+//Fast Fourier Transform\
+import TradingView/ta/5\
+\
+DFT(x, y, Nx, _dir) =>\
+    float _arg = 0.0\
+    float _cos = 0.0\
+    float _sin = 0.0\
+    float xArr_i = 0.0\
+    float yArr_i = 0.0\
+    xArr = array.new_float(array.size(x))\
+    yArr = array.new_float(array.size(y))\
+\
+    for i = 0 to Nx - 1 by 1\
+        xArr_i := 0.0\
+        yArr_i := 0.0\
+        kx = float(i) / float(Nx)\
+        _arg := -_dir * 2 * math.pi * kx\
+        for k = 0 to Nx - 1 by 1\
+            _cos := math.cos(k * _arg)\
+            _sin := math.sin(k * _arg)\
+            xArr_i += array.get(x, k) * _cos - array.get(y, k) * _sin\
+            yArr_i += array.get(x, k) * _sin + array.get(y, k) * _cos\
+            yArr_i\
+        array.set(xArr, i, xArr_i)\
+        array.set(yArr, i, yArr_i)\
+\
+    if _dir == 1\
+        for i = 0 to Nx - 1 by 1\
+            array.set(x, i, array.get(xArr, i) / float(Nx))\
+            array.set(y, i, array.get(yArr, i) / float(Nx))\
+    else\
+        for i = 0 to Nx - 1 by 1\
+            array.set(x, i, array.get(xArr, i))\
+            array.set(y, i, array.get(yArr, i))\
+//\
+\
+N = input.int(2,"Fourier Smoothing", group = "Fourier Transform")\
+xval = input.source(close,"Fourier X Series")\
+//\
+\
+// Fourier transform\
+x = array.new_float(N, 0.0)\
+y = array.new_float(N, 0.0)\
+for i = 0 to N - 1\
+    array.set(x, i, xval[i])\
+    array.set(y, i, 0.0)\
+\
+DFT(x, y, N, 1)\
+\
+mag = array.new_float(N, 0.0)\
+for i = 0 to N - 1\
+    mag_i = math.sqrt(math.pow(array.get(x, i), 2) + math.pow(array.get(y, i), 2))\
+    array.set(mag, i, mag_i)\
+\
+dft = array.get(mag,0)\
+\
+\
+//PVT\
+signalLength = 25\
+pvt = ta.cum(ta.change(dft)/dft[1]*volume)\
+signal = ta.ema(pvt, signalLength)\
+\
+  \
+//Conditions\
+buyAlert = pvt > signal\
+sellAlert = pvt < signal\
+vzol = VZO_ > VZO_[1]\
+vzos = VZO_ < VZO_[1]\
+\
+goLong = buyAlert and vzol\
+goShort = sellAlert and vzos\
+first_buy = goLong and not(goLong[1])\
+first_sell = goShort and not(goShort[1])\
+\
+var side = ""\
+\
+if first_buy\
+    side := "buy"\
+if first_sell\
+    side := "sell"\
+ \
+// \
+goLong := (first_buy[1] and side[2] == "sell") \
+goShort := first_sell[1] and side[2] == "buy"\
+var color col = na\
+col := goLong ? color.new(green, 0) : goShort ? color.new(red, 0) : col \
+\
+\
+\
+//Reversal Clouds\
+colX = neon ? color.new(#00ffbb, 0) :color.new(#008504, 0) \
+colZ = neon ? color.new(#ff1100, 0) :color.new(#840000, 0)\
+\
+showbands = input.bool(true, "Show clouds?", group = "Interface Settings")\
+elen = 20 \
+plus = 5\
+src = close\
+\
+mult = 1.001\
+\
+//Higher Cloud\
+x4 = ta.highest(high, 20)\
+x4 := ta.vwma(x4, elen) * mult\
+x4x = plot(showbands ? x4: na, color=colZ, display=display.none)\
+elen += plus\
+x5 = ta.highest(high, 15)\
+x5 := ta.vwma(x5, elen) * mult\
+x5x = plot(showbands ? x5: na, color=colZ, display=display.none)\
+elen += plus\
+x6 = ta.highest(high, 10)\
+x6 := ta.vwma(x6, elen) * mult\
+x6x = plot(showbands ? x6: na, color=colZ, display=display.none)\
+elen += plus\
+x6Z = ta.highest(high, 5)\
+x6Z := ta.vwma(x6Z, elen) * mult\
+x6xZ = plot(showbands ? x6Z: na, color=colZ, display=display.none)\
+elen += plus\
+\
+//Lower Cloud\
+x7 = ta.lowest(low, 20)\
+x7 := ta.vwma(x7, elen) / mult\
+x7x = plot(showbands ? x7: na, color=colX, display=display.none)\
+elen += plus\
+x8 = ta.lowest(low, 15)\
+x8 := ta.vwma(x8, elen) / mult\
+x8x = plot(showbands ? x8: na, color=colX, display=display.none)\
+elen += plus\
+x9 = ta.lowest(low, 10)\
+x9 := ta.vwma(x9, elen) / mult\
+x9x = plot(showbands ? x9: na, color=colX, display=display.none)\
+elen += plus\
+x10 = ta.lowest(low, 5)\
+x10 := ta.vwma(x10, elen) / mult\
+x10x = plot(showbands ? x10: na, color=colX, display=display.none)\
+elen += plus\
+\
+fill(x7x, x8x, color = color.new(green, 60))\
+fill(x8x, x9x, color = color.new(green, 70))\
+fill(x9x, x10x, color = color.new(green, 80))\
+\
+fill(x4x, x5x, color = color.new(red, 60))\
+fill(x5x, x6x, color = color.new(red, 70))\
+fill(x6x, x6xZ, color = color.new(red, 80))\
+\
+\
+// Plot Buy and Sell Signals\
+plotshape(first_buy[1] and side[2] == "sell" and barstate.isconfirmed, title = "Buy Signal", color = color.new(green, 0), textcolor = color.rgb(255, 255, 255), text = "
+\f2 \'a1\'f8
+\f0 ", style = shape.labelup, location = location.belowbar, size = size.tiny)\
+plotshape(first_sell[1] and side[2] == "buy" and barstate.isconfirmed, title = "Sell Signal", color = color.new(red, 0), textcolor = color.rgb(255, 255, 255), text = "
+\f3 \uc0\u9660 
+\f0 ", style = shape.labeldown, location = location.abovebar, size = size.tiny)\
+\
+plotchar(ta.crossover(src, x7) ? x7 - ta.stdev(src, 2, true) : na, char = "X", color = color.new(green, 0), location = location.absolute, size = size.tiny)\
+plotchar(ta.crossunder(src, x4) ? x4 + ta.stdev(src, 2, true) : na, char = "X", color = color.new(red, 0), location = location.absolute, size = size.tiny)\
+\
+barcolor(col)\
+plotcandle(open, high, low, close, color = col, wickcolor = col, bordercolor = col)\
+\
+plot(ta.ema(close,9), color = color.white)\
+\
+alertcondition(first_buy[1] and side[2] == "sell", title="Buy!", message="Go Long! \{\{exchange\}\}:\{\{ticker\}\}")\
+alertcondition(first_sell[1] and side[2] == "buy", title="Sell!", message="Go Short! \{\{exchange\}\}:\{\{ticker\}\}")\
+  }

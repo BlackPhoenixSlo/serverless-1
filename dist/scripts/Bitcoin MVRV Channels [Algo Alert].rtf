@@ -1,0 +1,51 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2638
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 // This source code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/\
+// \'a9 Algo_Alert\
+\
+//@version=5\
+indicator('\uc0\u8272  Bitcoin MVRV Channels [Algo Alert]', precision = 2, overlay = true)\
+Length = input.int(150, "Z score Lookback Length")\
+len = input.int(60, "Moving Average Lookback Length")\
+\
+bullcolor =#6d6dff\
+bearcolor = #ffd16d\
+\
+StdDevs = input(6.0, "Range Multiplier")\
+src = request.security("BTC_MVRV", "1D",close)\
+\
+basis = ta.sma(src, Length)\
+\
+z = (src - basis) / ta.stdev(src, Length)\
+z := request.security(syminfo.tickerid, "1D", z)\
+\
+topupper = StdDevs\
+toplower = StdDevs * 0.58\
+bottomupper = -StdDevs * 0.58\
+bottomlower = -StdDevs\
+\
+p = ta.ema(close + (topupper-z)*3000, 6)\
+pp = ta.ema(close + (bottomlower-z)*3000, 6)\
+ppp = ta.ema(close + (toplower-z)*3000, 6)\
+pppp = ta.ema(close + (bottomupper-z)*3000, 6)\
+/////////////////////////////////////PLOTS\
+p1 = plot(p, display = display.none)\
+p2 = plot(pp, color = color.red, display = display.none)\
+p3 = plot(ppp, color = color.green, display = display.none)\
+p4 = plot(pppp, color = color.aqua, display = display.none)\
+plot(math.avg(p, pp), color = close > math.avg(p, pp) ? #00ffbb : #ff1100)\
+\
+/////////////////////////////////////Overbought and Oversold Levels\
+\
+fill(p1, p3, top_value = p, bottom_value =ppp, top_color = color.new(bullcolor, 50), bottom_color = color.new(bullcolor, 90))\
+fill(p2, p4, top_value =pppp, bottom_value = pp, top_color = color.new(bearcolor, 90), bottom_color = color.new(bearcolor, 50))\
+\
+alertcondition(close > math.avg(p, pp), "Trend up", "MVRV Trending Up")\
+alertcondition(close < math.avg(p, pp), "Trend down", "MVRV Trending Down")\
+alertcondition(close > ppp, "Overbought", "Price is Entering MVRV Upper Band")\
+alertcondition(close < pppp, "Oversold", "Price is Entering MVRV Lower Band")}

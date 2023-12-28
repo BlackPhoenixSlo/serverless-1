@@ -1,0 +1,250 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2638
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;\f1\fnil\fcharset0 AppleSymbols;\f2\fnil\fcharset134 PingFangSC-Regular;
+\f3\fnil\fcharset0 LucidaGrande;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 // This source code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/\
+// \'a9 Algo_Alert\
+\
+//@version=5\
+indicator(title='
+\f1 \uc0\u10762 
+\f0  Standardized Orderflow [Algo Alert]', overlay=false)\
+\
+// Input parameters\
+orderFlowPeriod = input.int(12, minval=1, title='Order Flow Period', group = "Calculation Parameters")\
+emalen = input(14, "Velocity Signal Length", group = "Calculation Parameters")\
+emalen1 = input(21, "Velocity Calculation Length", group = "Calculation Parameters")\
+disptype = input.string("Both", "Display Mode", ["Both", "Order Flow", "Order Velocity"], group = "Display Options")\
+revtype = input.string("Both", "Reversal Type", ["Both", "Order Flow", "Order Velocity"], group = "Display Options")\
+green = input.color(#00ffbb, "Histogram Up color")\
+red = input.color(#ff1100, "Histogram Down color")\
+hagreen = input.color(#99ffee, "HA candle Up color")\
+hared = input.color(#818181, "HA candle Down color")\
+\
+\
+//Order Flow\
+orderFlow = math.sum(close > close[1] ? volume : (close < close[1] ? -volume : 0), orderFlowPeriod)\
+orderFlow := orderFlow /1000\
+\
+stdev = ta.stdev(orderFlow, 45) * 1\
+orderFlowX = orderFlow/(stdev+stdev)\
+chg1 = orderFlowX*0.70\
+chg2 = orderFlowX*0.65\
+chg3 = orderFlowX*0.55\
+chg4 = orderFlowX*0.40\
+\
+diff = ta.ema((orderFlowX - ta.ema(orderFlowX, emalen)) * 10, emalen1)\
+\
+ofdispcon = disptype != "Order Velocity" ? display.all : display.none\
+\
+transpcon1 = disptype == "Order Flow" ? 0 : 35\
+\
+//plot(orderFlowX)\
+plot(orderFlowX, color = color.new(orderFlowX > 0 ? green : red, transpcon1+60), style = plot.style_histogram, linewidth = 4, display = ofdispcon)\
+plot(chg1, color = color.new(orderFlowX > 0 ? green : red, transpcon1+55), style = plot.style_histogram, linewidth = 4, display = ofdispcon)\
+plot(chg2, color = color.new(orderFlowX > 0 ? green : red, transpcon1+45), style = plot.style_histogram, linewidth = 4, display = ofdispcon)\
+plot(chg3, color = color.new(orderFlowX > 0 ? green : red, transpcon1+30), style = plot.style_histogram, linewidth = 4, display = ofdispcon)\
+plot(chg4, color = color.new(orderFlowX > 0 ? green : red, transpcon1+25), style = plot.style_histogram, linewidth = 4, display = ofdispcon)\
+plot(orderFlowX, color = color.new(orderFlowX > 0 ? green : red, transpcon1), display = ofdispcon)\
+\
+z = plot(0, color = color.gray, style = plot.style_cross)\
+f = plot(4, display = display.none)\
+t = plot(2, display = display.none)\
+negf = plot(-4, display = display.none)\
+negt = plot(-2, display = display.none)\
+onepntf = plot(1, color = red, display = display.none)\
+negonepntf = plot(-1, color = green, display = display.none)\
+\
+narrowdispcon = disptype == "Order Flow" ? display.all : display.none\
+widedispcon = disptype != "Order Flow" ? display.all : display.none\
+\
+fill(z, f, top_value =  4, bottom_value = 1, bottom_color = na, top_color = color.new(red,65), display = widedispcon)\
+fill(z, negf, top_value =  -1, bottom_value = -4, bottom_color = color.new(green,65) , top_color = na, display = widedispcon)\
+fill(z, t, top_value =  2, bottom_value = 1, bottom_color = na, top_color = color.new(red,65), display = narrowdispcon)\
+fill(z, negt, top_value =  -1, bottom_value = -2, bottom_color = color.new(green,65) , top_color = na, display = narrowdispcon)\
+\
+bullrevcon = revtype == "Order Flow" ? ta.crossover(orderFlowX, -1.5) : (revtype == "Order Velocity" ? ta.crossover(diff, -4) : (ta.crossover(diff, -4) or ta.crossover(orderFlowX, -1.5)) )\
+bearrevcon = revtype == "Order Flow" ? ta.crossunder(orderFlowX, 1.5) : (revtype == "Order Velocity" ? ta.crossunder(diff, 4) : (ta.crossunder(diff, 4) or ta.crossunder(orderFlowX, 1.5)) )\
+\
+plotchar(bullrevcon ? (disptype == "Order Flow" ? -2.5 : -6) : na, char = "
+\f2 \'a1\'f8
+\f0 ", color = green, location = location.absolute, size = size.tiny)\
+plotchar(bearrevcon ? (disptype == "Order Flow" ? 2.5 : 6) : na, char = "
+\f3 \uc0\u9660 
+\f0 ", color = red, location = location.absolute, size = size.tiny)\
+\
+o = diff[1]\
+h = math.max(diff, diff[1])\
+l = math.min(diff, diff[1])\
+c = diff\
+\
+haClose = (o + h + l + c) / 4\
+haOpen = float(na)\
+haOpen := na(haOpen[1]) ? (o + c) / 2 : (nz(haOpen[1]) + nz(haClose[1])) / 2\
+haHigh = math.max(h, math.max(haOpen, haClose))\
+haLow = math.min(l, math.min(haOpen, haClose))        \
+\
+//transpcon = disptype == "Order Velocity" ? 0 : 65\
+\
+g = color.new(hagreen, 0)\
+r = color.new(hared, 0)\
+\
+hadispcon = disptype != "Order Flow" ? display.all : display.none\
+\
+plotcandle(haOpen, haHigh, haLow, haClose, "Heiken Ashi RSI", haClose > haOpen ? g : r, haClose > haOpen ? g : r, bordercolor = haClose > haOpen ? g : r, display = hadispcon)\
+\
+plotBull = input(title="Plot Bullish", defval=true, group = "Divergences")\
+plotHiddenBull = input(title="Plot Hidden Bullish", defval=false, group = "Divergences")\
+plotBear = input(title="Plot Bearish", defval=true, group = "Divergences")\
+plotHiddenBear = input(title="Plot Hidden Bearish", defval=false, group = "Divergences")\
+bearColor = hagreen\
+bullColor = hared\
+hiddenBullColor = color.new(hagreen, 80)\
+hiddenBearColor = color.new(hared, 80)\
+textColor = color.white\
+noneColor = color.new(color.white, 100)\
+\
+divdisp =  disptype != "Order Flow" ? display.all : display.none\
+\
+lbR = input(title="Pivot Lookback Right", defval=1)\
+lbL = input(title="Pivot Lookback Left", defval=20)\
+\
+plFound = na(ta.pivotlow(diff, lbL, lbR)) ? false : true\
+phFound = na(ta.pivothigh(diff, lbL, lbR)) ? false : true\
+_inRange(cond) =>\
+	bars = ta.barssince(cond == true)\
+	-80 <= bars and bars <= 80\
+\
+//------------------------------------------------------------------------------\
+// Regular Bullish\
+// Osc: Higher Low\
+\
+oscHL = diff[lbR] > ta.valuewhen(plFound, diff[lbR], 1) and _inRange(plFound[1])\
+\
+// Price: Lower Low\
+\
+priceLL = low[lbR] < ta.valuewhen(plFound, low[lbR], 1)\
+bullCond = plotBull and priceLL and oscHL and plFound\
+\
+plot(\
+     plFound ? diff[lbR] : na,\
+     offset=-lbR,\
+     title="Regular Bullish",\
+     linewidth=2,\
+     color=(bullCond ? bullColor : noneColor),\
+     display = divdisp\
+     )\
+\
+plotshape(\
+	 bullCond ? diff[lbR] : na,\
+	 offset=-lbR,\
+	 title="Regular Bullish Label",\
+	 text=" Bull ",\
+	 style=shape.labelup,\
+	 location=location.absolute,\
+	 color=bullColor,\
+	 textcolor=textColor,\
+     display = divdisp\
+	 )\
+\
+//------------------------------------------------------------------------------\
+// Hidden Bullish\
+// Osc: Lower Low\
+\
+oscLL = diff[lbR] < ta.valuewhen(plFound, diff[lbR], 1) and _inRange(plFound[1])\
+\
+// Price: Higher Low\
+\
+priceHL = low[lbR] > ta.valuewhen(plFound, low[lbR], 1)\
+hiddenBullCond = plotHiddenBull and priceHL and oscLL and plFound\
+\
+plot(\
+	 plFound ? diff[lbR] : na,\
+	 offset=-lbR,\
+	 title="Hidden Bullish",\
+	 linewidth=2,\
+	 color=(hiddenBullCond ? hiddenBullColor : noneColor),\
+     display = divdisp\
+	 )\
+\
+plotshape(\
+	 hiddenBullCond ? diff[lbR] : na,\
+	 offset=-lbR,\
+	 title="Hidden Bullish Label",\
+	 text=" H Bull ",\
+	 style=shape.labelup,\
+	 location=location.absolute,\
+	 color=bullColor,\
+	 textcolor= textColor,\
+     display = divdisp\
+	 )\
+\
+//------------------------------------------------------------------------------\
+// Regular Bearish\
+// Osc: Lower High\
+\
+oscLH = diff[lbR] < ta.valuewhen(phFound, diff[lbR], 1) and _inRange(phFound[1])\
+\
+// Price: Higher High\
+\
+priceHH = high[lbR] > ta.valuewhen(phFound, high[lbR], 1)\
+\
+bearCond = plotBear and priceHH and oscLH and phFound\
+\
+plot(\
+	 phFound ? diff[lbR] : na,\
+	 offset=-lbR,\
+	 title="Regular Bearish",\
+	 linewidth=2,\
+	 color=(bearCond ? bearColor : noneColor),\
+     display = divdisp\
+	 )\
+\
+plotshape(\
+	 bearCond ? diff[lbR] : na,\
+	 offset=-lbR,\
+	 title="Regular Bearish Label",\
+	 text=" Bear ",\
+	 style=shape.labeldown,\
+	 location=location.absolute,\
+	 color=bearColor,\
+	 textcolor=color.rgb(84, 84, 84),\
+     display = divdisp\
+	 )\
+\
+//------------------------------------------------------------------------------\
+// Hidden Bearish\
+// VZO: Higher High\
+\
+oscHH = diff[lbR] > ta.valuewhen(phFound, diff[lbR], 1) and _inRange(phFound[1])\
+\
+// Price: Lower High\
+\
+priceLH = high[lbR] < ta.valuewhen(phFound, high[lbR], 1)\
+\
+hiddenBearCond = plotHiddenBear and priceLH and oscHH and phFound\
+\
+plot(\
+	 phFound ? diff[lbR] : na,\
+	 offset=-lbR,\
+	 title="Hidden Bearish",\
+	 linewidth=2,\
+	 color=(hiddenBearCond ? hiddenBearColor : noneColor),\
+     display = divdisp\
+	 )\
+\
+plotshape(\
+	 hiddenBearCond ? diff[lbR] : na,\
+	 offset=-lbR,\
+	 title="Hidden Bearish Label",\
+	 text=" H Bear ",\
+	 style=shape.labeldown,\
+	 location=location.absolute,\
+	 color=bearColor,\
+	 textcolor=color.rgb(84, 84, 84),\
+     display = divdisp\
+	 )}

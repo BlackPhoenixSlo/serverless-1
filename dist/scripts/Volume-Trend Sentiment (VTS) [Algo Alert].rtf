@@ -1,0 +1,92 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2638
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fnil\fcharset0 HelveticaNeue;\f1\fnil\fcharset0 AppleSymbols;}
+{\colortbl;\red255\green255\blue255;\red237\green233\blue224;\red7\green7\blue7;}
+{\*\expandedcolortbl;;\cssrgb\c94510\c92941\c90196;\cssrgb\c2353\c2353\c2353;}
+\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\deftab720
+\pard\pardeftab720\ri240\partightenfactor0
+
+\f0\fs40 \cf2 \cb3 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 // This source code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/\
+// \'a9 Algo_Alert\
+\
+//@version=5\
+indicator("
+\f1 \uc0\u10759 \u10760 
+\f0  Volume-Trend Sentiment [Algo Alert]")\
+\
+\
+//VTS Inputs\
+showhis = input.bool(false, "Show Histogram?", group = "Settings")\
+l = input.int(7, minval = 2, title = "VTS length", group = "Volume Trend Sentiment")\
+l1 = input.int(7, minval = 2, title = "Standard Deviation length", group = "Volume Trend Sentiment")\
+l2 = input.int(7, minval = 2, title = "VTS SMA length", group = "Volume Trend Sentiment")\
+\
+\
+//VTS Calculation\
+vts = ta.ema((close-open)/volume, l)-ta.ema(ta.ema((close-open)/volume, l), l)\
+\
+stdev = ta.stdev(vts, l1) * 1\
+vtsX = ta.sma(vts/(stdev+stdev), l2)\
+\
+//Sentiment Background Colors\
+co(vtsX) =>\
+    if vtsX>0.95\
+        color.new(color.blue,0)\
+    else if vtsX>0.90\
+        color.new(color.blue,10)\
+    else if vtsX>0.80\
+        color.new(color.blue,20)\
+    else if vtsX>0.70\
+        color.new(color.blue,30)\
+    else if vtsX>0.60\
+        color.new(color.blue,40)\
+    else if vtsX>0.50\
+        color.new(color.blue,50)\
+    else if vtsX>0.40\
+        color.new(color.blue,60)\
+    else if vtsX>0.30\
+        color.new(color.blue,70)\
+    else if vtsX>0.20\
+        color.new(color.blue,80)\
+    else if vtsX>0.10\
+        color.new(color.blue,90)\
+    else if vtsX==0.00\
+        (color.rgb(239, 0, 0,90))\
+    else if vtsX>-0.10\
+        color.rgb(239, 0, 0,80)\
+    else if vtsX>-0.20\
+        color.rgb(239, 0, 0,70)\
+    else if vtsX>-0.30\
+        color.rgb(239, 0, 0,60)\
+    else if vtsX>-0.40\
+        color.rgb(239, 0, 0,50)\
+    else if vtsX>-0.50\
+        color.rgb(239, 0, 0,40)\
+    else if vtsX>-0.60\
+        color.rgb(239, 0, 0,30)\
+    else if vtsX>-0.70\
+        color.rgb(239, 0, 0,20)\
+    else if vtsX>-0.80\
+        color.rgb(239, 0, 0,10)\
+    else if vtsX>-0.95\
+        color.rgb(239, 0, 0,0)\
+    else\
+        color.rgb(239, 0, 0,0)\
+bgcolor(co(vtsX))\
+\
+\
+//Plots\
+plot(showhis ? (vts/(stdev+stdev)): na, color = vts > 0 ? color.rgb(0, 0, 0) : color.rgb(0, 0, 0), style = plot.style_columns, linewidth = 3)\
+vtsplot = plot(vtsX, color = color.white, linewidth = 2)\
+mid = plot(0, color = color.gray, style = plot.style_circles)\
+fill(vtsplot, mid, color = vtsX > 0 ? color.navy : color.maroon)\
+\
+//OB/OS Zones (Removed but feel free to add back)\
+// r = plot(2, color = color.rgb(255, 82, 82, 70))\
+// r1 = plot(1, color = color.rgb(255, 82, 82, 70))\
+// s = plot(-2, color = color.rgb(76, 175, 79, 70))\
+// s1 = plot(-1, color = color.rgb(76, 175, 79, 70))\
+// fill(s,s1, color = color.rgb(76, 175, 79, 70))\
+// fill(r,r1, color = color.rgb(255, 82, 82, 70))\
+}

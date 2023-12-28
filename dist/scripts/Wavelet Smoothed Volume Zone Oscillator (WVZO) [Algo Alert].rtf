@@ -1,0 +1,89 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2638
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;\f1\fnil\fcharset0 AppleSymbols;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 //@version=5\
+///PAID\
+indicator("Wavelet Smoothed Volume Zone Oscillator (WVZO) [Algo Alert]", shorttitle = "\uc0\u8096  WVZO [Algo Alert]", precision = 0)\
+\
+neon = input.bool(title = 'Neon Color Theme', defval = true)\
+red = neon ? #ff1100 : #FF0000\
+green = neon ? #00ffbb : #00FF13\
+\
+//Wavelet Transform\
+src = input(close, title='Source', group = "Wavelet Transform Settings")\
+smooth = input.int(1, title='Smoothing', minval=1, group = "Wavelet Transform Settings")\
+length = input.int(15, title='Lookback', minval=1, group = "Wavelet Transform Settings")\
+offset = 0.85//input.float(0.85, title='ALMA Offset', step=0.01, group = "Wavelet Transform Settings")\
+sigma = 6//input.int(6, title='ALMA Sigma', minval=0, group = "Wavelet Transform Settings")\
+pch = ta.change(src, smooth) / src * 100\
+avpch = ta.alma(pch, length, offset, sigma)\
+\
+//Ehler's Universal Oscillator\
+bandedge = input.int(10, minval=1, title='Universal Oscillator Calculation Period', group = "Universal Oscillator")\
+amp = input(80, "Universal Oscillator Amplitude", group = "Universal Oscillator")\
+whitenoise = (close - close[2]) / 2\
+wnshow = input.bool(true, "Show ehler's universal oscillator?", group = "Universal Oscillator")\
+a1 = math.pow(-1.414 * 3.14159 / bandedge, 2)\
+b1 = 2 * a1 * math.cos(1.414 * 180 / bandedge)\
+c2 = b1\
+c3 = -a1 * a1\
+c1 = 1 - c2 - c3\
+var filt = float(na)\
+filt := na(filt[1]) ? 0 : c1 * (whitenoise + nz(whitenoise[1])) / 2.0 + c2 * nz(filt[1]) + c3 * nz(filt[2])\
+\
+//automatic gain control\
+var peak = float(na)\
+peak := na(peak[1]) ? 0 : math.abs(filt) > nz(peak[1]) ? math.abs(filt) : 0.991 * nz(peak[1])\
+universal = filt / peak\
+\
+scaled_universal = universal * amp\
+plot(wnshow ? scaled_universal: na, title="Universal Oscillator", color=universal>0?(universal>0?color.new(#ffffff, 80):color.rgb(174, 174, 174)):(universal>0?color.new(#b743ff, 72):color.new(#6b57ff, 80)), linewidth=2, style = plot.style_columns)\
+\
+//Vzo Calc\
+smoothvzo = input.bool(true, "Smooth VZO?", group = "VZO")\
+lengthV = input(6, title='VZO Length', group = "VZO")\
+dvol = math.sign(avpch - avpch[2]) * volume \
+dvma = ta.ema(dvol, lengthV) //ema\
+vma = ta.sma(volume, lengthV) //sma  \
+VZO_ = vma != 0 ? 100 * dvma / vma : 0\
+\
+// Smoothness (Reduce noise)\
+smo = input(7, "WMA Smoothing", "VZO")\
+\
+if smoothvzo\
+    VZO_ := ta.wma(VZO_, smo) \
+//\
+\
+//Conditions\
+ob = input.float(45, 'Overbought Level', group = "Overbought/Oversol Zones")\
+os = input(-45, "Oversold Level", group = "Overbought/Oversol Zones")\
+uniMRL = scaled_universal[1] < os\
+uniMRS = scaled_universal[1] > ob\
+\
+//Plots\
+vzo11 = plot(VZO_, color = VZO_ > VZO_[1] ? (neon ? color.new(green,0) : color.rgb(0, 137, 5)) : (neon ? color.new(red,0) : color.rgb(140, 0, 0)), linewidth = 4)\
+plotchar(ta.crossover(VZO_,VZO_[1]) ? VZO_[1] : na, char = "
+\f1 \uc0\u10687 
+\f0 ", location = location.absolute, size = size.tiny, color = neon ? color.new(green,0) : color.rgb(39, 215, 0), offset = -1)\
+plotchar(ta.crossunder(VZO_,VZO_[1]) ? VZO_[1]: na, char = "
+\f1 \uc0\u10687 
+\f0 ", location = location.absolute, size = size.tiny, color = neon ? color.new(red,0) : color.rgb(255, 0, 0), offset = -1)\
+plotshape((ta.crossover(VZO_,VZO_[1]) and uniMRL) ? VZO_ - 15 : na, style = shape.labelup, text = "R", textcolor = color.white, color = neon ? color.new(green,0) :color.rgb(0, 150, 5), location = location.absolute, size = size.tiny, offset = -1)\
+plotshape((ta.crossunder(VZO_, VZO_[1]) and uniMRS) ? VZO_ + 15: na, style = shape.labeldown, text = "R", textcolor = color.white, color =  neon ? color.new(red,0) : color.rgb(142, 0, 0), location = location.absolute, size = size.tiny, offset = -1)\
+mid = plot(0, display = display.none)\
+obb = plot(ob+35, display = display.none)\
+oss = plot(os-35, display = display.none)\
+\
+fill(vzo11, mid, VZO_ > VZO_[1] ? VZO_ : 0, VZO_ > VZO_[1] ? 0 : VZO_, VZO_ > VZO_[1] ? (neon ? color.new(green,0) : #00c41da1) : #00000000, VZO_ > VZO_[1] ? #00000000 : (neon ? color.new(red,0) : #b2000fb9))\
+\
+fill(mid, obb, top_value =  ob+35, bottom_value = ob/2, bottom_color = na, top_color = color.new(red,65))\
+fill(mid, oss, top_value =  os/2, bottom_value = os-35, bottom_color = color.new(green,65) , top_color = na)\
+\
+alertcondition(ta.crossover(VZO_,VZO_[1]), title="Uptrend", message="Go Long! \{\{exchange\}\}:\{\{ticker\}\}")\
+alertcondition(ta.crossunder(VZO_,VZO_[1]), title="Downtrend", message="Go Short! \{\{exchange\}\}:\{\{ticker\}\}")\
+alertcondition((ta.crossover(VZO_,VZO_[1]) and uniMRL), title="Bullish Reversal", message="Bullish Reversal! \{\{exchange\}\}:\{\{ticker\}\}")\
+alertcondition((ta.crossunder(VZO_, VZO_[1]) and uniMRS), title="Bearish Reversal", message="Bearish Reversal! \{\{exchange\}\}:\{\{ticker\}\}")}

@@ -1,0 +1,72 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2638
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;\f1\fnil\fcharset0 AppleSymbols;\f2\fnil\fcharset134 PingFangSC-Regular;
+\f3\fnil\fcharset0 LucidaGrande;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 //@version=5\
+// This source code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/\
+// \'a9 Algo_Alert\
+\
+indicator('
+\f1 \uc0\u11003 
+\f0  Trend Intensity Exhaustion [Algo Alert]', timeframe="")\
+\
+green = input.color(#00ffbb, "TP Up Color")\
+red = input.color(#ff1100, "TP Down Color")\
+ngreen = input.color(#bababa, "Neutral Up Color") //#00ffbb\
+nred = input.color(#676767, "Neutral Down Color") //#ff1100\
+\
+\
+rsiLength = input(title='Relative Intensity Period', defval=28)\
+ema1Length = 2\
+ema2Length = input(title='EMA Smoothing Length', defval=10)\
+off = input.float(title='sensitivity reducer', defval=1.5, minval = 1, step = 0.1)\
+smaLength = math.round(off * ema2Length)\
+signalLength = input(title='Signal Length', defval=5)\
+src = input(title='Source', defval=close)\
+mode = input.bool(title = "Overlay Mode", defval = false)\
+ent = input.bool(title = "Show Entries", defval = false)\
+\
+smoothedRSI = ta.ema(ta.ema(ta.rsi(src, rsiLength), ema1Length), ema2Length)\
+dosc = smoothedRSI - ta.sma(smoothedRSI, smaLength)\
+absdosc = math.abs(dosc)\
+signal = ta.sma(dosc, signalLength)\
+\
+doscColor = dosc >= 0 ? dosc[1] < dosc ? color.new(green, 30) : color.new(green, 80) : dosc[1] < dosc ? color.new(red, 80) : color.new(red, 30)\
+plot(not mode ? absdosc : na, title='Trend Intensity', style=plot.style_columns, linewidth=2, color=doscColor)\
+//plot(signal[1], color = signal > signal[1] ? color.new(color.white, 40) : color.new(color.white, 80), title='Signal', linewidth=2)\
+lii = plot(not mode ? signal : na, color = signal > signal[1] ? color.new(color.gray, 50) : color.new(color.gray, 50) , title='Signal', linewidth=2)\
+mid = plot(not mode ? 0 : na, display = display.none)\
+\
+//fill(lii, mid, signal > 0 ? signal : 0, signal > 0 ? 0 : signal, signal > 0 ? color.new(green, 50) : #00000000, signal > 0 ? #00000000 : color.new(red, 50))\
+\
+//plotchar(ta.crossover(signal,signal[1]) ? signal : na, "Bull Mark", char = "o", location = location.absolute, color = green, size = size.tiny, offset = 0)\
+//plotchar(ta.crossunder(signal,signal[1]) ? signal : na, "Bear Mark", char = "o", location = location.absolute, color = red, size = size.tiny, offset = 0)\
+plotchar(ta.crossover(dosc,signal[0]) and not mode ? signal : na, "Bull Mark", char = "o", location = location.absolute, color = green, size = size.tiny, offset = 0)\
+plotchar(ta.crossunder(dosc,signal[0]) and not mode ? signal : na, "Bear Mark", char = "o", location = location.absolute, color = red, size = size.tiny, offset = 0)\
+\
+plotchar(ta.crossover(dosc,dosc[1]) and dosc < 0 and not mode ? absdosc*1.3 : na, "Bull Mark", char = "x", location = location.absolute, color = green, size = size.tiny, offset = 0)\
+plotchar(ta.crossunder(dosc,dosc[1]) and dosc > 0 and not mode ? absdosc*1.3 : na, "Bear Mark", char = "x", location = location.absolute, color = red, size = size.tiny, offset = 0)\
+\
+b = (ta.crossover(dosc,dosc[1]) and dosc < 0 and mode)\
+s = (ta.crossunder(dosc,dosc[1]) and dosc > 0 and mode)\
+\
+candlecolor = b ? green : s ? red : mode and close > open ? ngreen : mode and  close < open ? nred : na\
+\
+plotcandle(open, high, low, close, "candle color", candlecolor, candlecolor, bordercolor = candlecolor, display = mode ? display.all : display.none)\
+plotshape(ta.crossover(dosc,dosc[1]) and dosc < 0 and mode, title = "bullish tp Signal", color = color.new(green, 30), textcolor = color.rgb(255, 255, 255), text = "TP", style = shape.labelup, location = location.belowbar, size = size.tiny, display = mode ? display.all : display.none)\
+plotshape(ta.crossunder(dosc,dosc[1]) and dosc > 0 and mode, title = "bearish tp Signal", color = color.new(red, 30), textcolor = color.rgb(255, 255, 255), text = "TP", style = shape.labeldown, location = location.abovebar, size = size.tiny, display = mode ? display.all : display.none)\
+plotchar(ta.crossover(dosc,signal[0]) and mode and ent ? signal : na, "Bull Mark", char = "
+\f2 \'a1\'f8
+\f0 ", location = location.belowbar, color = green, size = size.tiny, offset = 0, display = mode ? display.all : display.none)\
+plotchar(ta.crossunder(dosc,signal[0]) and mode and ent ? signal : na, "Bear Mark", char = "
+\f3 \uc0\u9660 
+\f0 ", location = location.abovebar, color = red, size = size.tiny, offset = 0, display = mode ? display.all : display.none)\
+\
+alertcondition(ta.crossover(dosc,dosc[1]) and dosc < 0, "bullish tp Signal")\
+alertcondition(ta.crossunder(dosc,dosc[1]) and dosc > 0, "bearish tp Signal")\
+alertcondition(ta.crossover(dosc,signal[0]), "Bullish Entry")\
+alertcondition(ta.crossunder(dosc,signal[0]), "Bearish Entry")}

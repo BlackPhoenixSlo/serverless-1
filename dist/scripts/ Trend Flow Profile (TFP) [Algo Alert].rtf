@@ -1,0 +1,47 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2638
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;\f1\fnil\fcharset0 AppleColorEmoji;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 // This source code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/\
+// \'a9 Algo_Alert\
+\
+//@version=5\
+indicator(title='Trend Flow Profile', shorttitle='
+\f1 \uc0\u55357 \u56520 
+\f0  TFP [Algo Alert]', overlay=false)\
+\
+// Input parameters\
+orderFlowPeriod = input.int(12, minval=1, title='Trend Flow Period')\
+emashow = input.bool(true, "Show EMA band?")\
+emalen = input(8, "EMA Length")\
+\
+\
+//Trend Flow\
+orderFlow = math.sum(close > close[1] ? volume : (close < close[1] ? -volume : 0), orderFlowPeriod)\
+orderFlow := orderFlow /1000\
+\
+//Rate of Change\
+lenr = input(14, "ROC Length")\
+roc = ta.roc(close, lenr)\
+\
+//Calculation\
+trendflow = (roc + orderFlow) / 2\
+ematrend = ta.ema(trendflow, emalen)\
+\
+//Colors\
+gcol1 = color.rgb(0, 166, 25)\
+gcol2 = color.rgb(0, 244, 37)\
+rcol1 = color.rgb(166, 0, 0)\
+rcol2 = color.rgb(255, 0, 0)\
+col = (trendflow > 0 ? (trendflow > trendflow[1] ? gcol1 : gcol2) : (trendflow < trendflow[1] ? rcol1 : rcol2))\
+\
+// Plotting\
+plot(trendflow, title='Combined Indicator', color= col, linewidth=2, style=plot.style_columns)\
+plot(orderFlow, style = plot.style_columns, color=orderFlow > 0 ? color.rgb(0, 166, 25, 80) : color.rgb(178, 0, 0, 80))\
+plot(emashow ? ematrend: na, color = color.white)\
+\
+\
+}

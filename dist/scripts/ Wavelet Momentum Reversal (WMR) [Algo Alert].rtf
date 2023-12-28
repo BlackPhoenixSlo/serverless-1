@@ -1,0 +1,132 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2638
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 //@version=5\
+indicator('Wavelet Momentum Reversal (WMR) [Algo Alert]', shorttitle = "\uc0\u372  WMR [Algo Alert]", overlay=true)\
+\
+\
+//Alma - Wavelet Transform\
+src = input(close, title='Source', group = "Alma - Wavelet Transform")\
+smooth = input.int(1, title='Smoothing', minval=1, group = "Alma - Wavelet Transform")\
+length = input.int(16, title='Lookback', minval=1, group = "Alma - Wavelet Transform")\
+offset = input.float(0.85, title='ALMA Offset', step=0.01, group = "Alma - Wavelet Transform")\
+sigma = input.int(6, title='ALMA Sigma', minval=0, group = "Alma - Wavelet Transform")\
+pch = ta.change(src, smooth) / src * 100\
+avpch = ta.alma(pch, length, offset, sigma)\
+\
+\
+//Pivot Point Reversal \
+//Credit to author: Ru++ - ruplusplus@gmail.com\
+// last updated: 2018-03-21\
+leftBars = input(2, "Left Bars", group = "Pivot Reversal")\
+rightBars = input(2, "Right Bars", group = "Pivot Reversal")\
+\
+swh = ta.pivothigh(leftBars, rightBars)\
+swl = ta.pivotlow(leftBars, rightBars)\
+\
+swh_cond = not na(swh)\
+\
+hprice = 0.0\
+hprice := swh_cond ? swh : hprice[1]\
+\
+le = false\
+le := swh_cond ? true : le[1] and high > hprice ? false : le[1]\
+\
+swl_cond = not na(swl)\
+\
+lprice = 0.0\
+lprice := swl_cond ? swl : lprice[1]\
+\
+\
+se = false\
+se := swl_cond ? true : se[1] and low < lprice ? false : se[1]\
+\
+// Filter out signals if opposite signal is also on\
+se_filtered = se and not le\
+le_filtered = le and not se\
+\
+// Filter consecutive entries \
+prev = 0\
+prev := se_filtered ? 1 : le_filtered ? -1 : prev[1]\
+\
+se_final = se_filtered and prev[1] == -1\
+le_final = le_filtered and prev[1] == 1\
+\
+\
+\
+//RSI\
+rsilen = input(14, "RSI Length", group = "RSI")\
+rsi = ta.rsi(avpch, 14)\
+rob = input(85, "RSI Overbought", group = "RSI")\
+ros = input(25, "RSI Oversold", group = "RSI")\
+rsiL = rsi < ros \
+rsiS = rsi > rob\
+\
+\
+//BB Clouds\
+//credit to author: Chikamoto Apr 10, 2021\
+length1 = input.int(20, minval=1, group = "Bollinger Bands")\
+src1 = input(close, title='Source', group = "Bollinger Bands")\
+offsetx = input.int(0, 'Offset', minval=-500, maxval=500, group = "Bollinger Bands")\
+mult = input.float(2.0, minval=0.001, maxval=50, title='StdDev', group = "Bollinger Bands")\
+pcloud = input.bool(true, "Plot Clouds?", group = "Bollinger Bands")\
+\
+mult1 = input.int(2, minval=1)\
+mult2 = input.int(4, minval=1)\
+mult3 = input.int(8, minval=1)\
+\
+ex_len1 = mult1 * length1\
+ex_len2 = mult2 * length1\
+ex_len3 = mult3 * length1\
+\
+counter1 = bar_index % mult1\
+counter2 = bar_index % mult2\
+counter3 = bar_index % mult3\
+\
+ssrc1 = src1[counter1]\
+ssrc2 = src1[counter2]\
+ssrc3 = src1[counter3]\
+\
+ssma1 = ta.sma(ssrc1, ex_len1)\
+ssma2 = ta.sma(ssrc2, ex_len2)\
+ssma3 = ta.sma(ssrc3, ex_len3)\
+\
+sstdev1 = ta.stdev(ssrc1, ex_len1)\
+sstdev2 = ta.stdev(ssrc2, ex_len2)\
+sstdev3 = ta.stdev(ssrc3, ex_len3)\
+\
+upper1 = 2 * sstdev1 + ssma1\
+upper2 = 2 * sstdev2 + ssma2\
+upper3 = 2 * sstdev3 + ssma3\
+\
+lower1 = ssma1 - 2 * sstdev1\
+lower2 = ssma2 - 2 * sstdev2\
+lower3 = ssma3 - 2 * sstdev3\
+bblong = low < lower1\
+bbshort = high > upper1\
+\
+\
+//Plots\
+u1 = plot(upper1, display = display.none)\
+l1 = plot(lower1, display = display.none)\
+u2 = plot(upper2, display = display.none)\
+l2 = plot(lower2, display = display.none)\
+u3 = plot(upper3, display = display.none)\
+l3 = plot(lower3, display = display.none)\
+fill(u1, l1, title='Background', color=color.rgb(61, 214, 217, 90))\
+fill(u2, l2, title='Background', color=color.rgb(61, 214, 217, 90))\
+fill(u3, l3, title='Background', color=color.rgb(061, 214, 217, 95))\
+\
+\
+\
+plotshape(se_final or rsiL, color=color.new(#48f000, 0), style = shape.triangleup, size = size.tiny, location=location.belowbar)\
+plotshape(le_final or rsiS, color=color.new(#ff0000, 0), style = shape.triangledown , size = size.tiny, location=location.abovebar)\
+\
+\
+//Alerts\
+alertcondition(se_final or rsiL, title="Buy!", message="Go Long! \{\{exchange\}\}:\{\{ticker\}\}")\
+alertcondition(le_final or rsiS, title="Sell!", message="Go Short! \{\{exchange\}\}:\{\{ticker\}\}")}

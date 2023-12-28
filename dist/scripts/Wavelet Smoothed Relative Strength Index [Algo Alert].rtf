@@ -1,0 +1,154 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2638
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;\f1\fnil\fcharset134 PingFangSC-Regular;\f2\fnil\fcharset0 LucidaGrande;
+}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 //@version=5\
+indicator(title="Wavelet Smoothed Relative Strength Index [Algo Alert]", shorttitle="\uc0\u8099  WRSI [Algo Alert]", format=format.price, precision=2)\
+import TradingView/ta/5\
+v2 = input.bool(title = 'Use Noise cancellation', defval = true)\
+HA = input.bool(title = 'Heiken Ashi Noise Filtering', defval = false)\
+\
+//Wavelet\
+src = input(close, title='Source', group = "Wavelet Transform")\
+smooth = input.int(1, title='Smoothing', minval=1, group = "Wavelet Transform")\
+length = input.int(16, title='Lookback', minval=1, group = "Wavelet Transform")\
+offset = input.float(0.77, title='ALMA Offset', step=0.01, group = "Wavelet Transform")\
+sigma = input.int(6, title='ALMA Sigma', minval=0, group = "Wavelet Transform")\
+pch = ta.change(src, smooth) / src * 100\
+avpch = ta.alma(pch, length, offset, sigma)\
+\
+\
+\
+//Volume Oscillator \
+bandedge = input.int(10, minval=1, title='Volume', group = "Volume Oscillator")\
+amp = input(80, "Volume Amplitude", group = "Volume Oscillator")\
+whitenoise = (close - close[2]) / 2\
+//wnshow = input.bool(false, "Show white noise?", group = "White Noise")\
+a1 = math.pow(-1.414 * 3.14159 / bandedge, 2)\
+b1 = 2 * a1 * math.cos(1.414 * 180 / bandedge)\
+c2 = b1\
+c3 = -a1 * a1\
+c1 = 1 - c2 - c3\
+var filt = float(na)\
+filt := na(filt[1]) ? 0 : c1 * (whitenoise + nz(whitenoise[1])) / 2.0 + c2 * nz(filt[1]) + c3 * nz(filt[2])\
+\
+//automatic gain control\
+var peak = float(na)\
+peak := na(peak[1]) ? 0 : math.abs(filt) > nz(peak[1]) ? math.abs(filt) : 0.991 * nz(peak[1])\
+universal = filt / peak\
+scaled_universal = universal * amp\
+//plot(wnshow ? 50 + scaled_universal: na, title="Universal Oscillator", color=universal>0?(universal>0?color.new(#ffffff, 60):color.rgb(0, 166, 6)):(universal>0?color.new(#3c84ff, 70):color.new(#40a3f4, 60)), linewidth=2, style = plot.style_columns)\
+\
+//RSI\
+ma(source, length, type) =>\
+    switch type\
+        "SMA" => ta.sma(source, length)\
+        "Bollinger Bands" => ta.sma(source, length)\
+        "EMA" => ta.ema(source, length)\
+        "SMMA (RMA)" => ta.rma(source, length)\
+        "WMA" => ta.wma(source, length)\
+        "VWMA" => ta.vwma(source, length)\
+\
+rsiLengthInput = input.int(14, minval=1, title="RSI Length", group="RSI Settings")\
+rsiSourceInput = input.source(close, "Source", group="RSI Settings")\
+maTypeInput = input.string("WMA", title="MA Type", options=["SMA", "Bollinger Bands", "EMA", "SMMA (RMA)", "WMA", "VWMA"], group="MA Settings")\
+maLengthInput = input.int(14, title="MA Length", group="MA Settings")\
+bbMultInput = input.float(2.0, minval=0.001, maxval=50, title="BB StdDev", group="MA Settings")\
+showrsima = input.bool(true, "Show RSI MA?")\
+smoothlen = input(6, "RSI Smoothing")\
+smoothrsi = input.bool(true, "Smooth RSI?")\
+\
+\
+up = ta.wma(math.max(ta.change(avpch*ta.pvt), 0), rsiLengthInput) //wma\
+down = ta.wma(-math.min(ta.change(avpch*ta.pvt), 0), rsiLengthInput) //wma\
+rsi = down == 0 ? 100 : up == 0 ? 0 : 100 - (100/ (1.0 + up / down))\
+\
+\
+// Smoothness (Reduce noise)\
+var emaLength = input(1, "EMA Length", group = "Smoothing") //1\
+minEmaLength = 1\
+maxEmaLength = 8 //8\
+\
+ \
+uniL = universal > 0  \
+vzoL = rsi>rsi[1]\
+\
+// Dynamically adjust EMA length based on conditions\
+if (uniL and vzoL) or (not uniL and not vzoL)\
+    emaLength := emaLength + 1\
+else if(uniL and not vzoL) or (not uniL and vzoL)\
+    emaLength := emaLength -1\
+ \
+// Reset EMA length to default if it exceeds the limits\
+if emaLength > maxEmaLength or emaLength < minEmaLength\
+    emaLength := 7 //7\
+\
+if smoothrsi\
+    rsi := ta.ema2(rsi, emaLength) \
+//\
+\
+\
+rsiMA = ma(rsi, maLengthInput, maTypeInput)\
+isBB = maTypeInput == "Bollinger Bands"\
+\
+\
+long = ta.crossover(rsi, v2 ? ta.ema(rsi, 5) : rsi[1]) \
+short = ta.crossunder(rsi, v2 ? ta.ema(rsi, 5) : rsi[1]) \
+\
+\
+rsibullcolor = #00ffbb \
+rsibearcolor = #ff1100\
+\
+\
+//Plots\
+rsiPlot = plot(not HA ? rsi : na, "RSI", color = rsi > (v2 ? ta.ema(rsi, 5) : rsi[1]) ? rsibullcolor : rsibearcolor, linewidth = 2)\
+plotshape(long and barstate.isconfirmed and not HA ? rsi[1] : na, style = shape.circle, location = location.absolute, size = size.tiny, color = rsibullcolor, offset = -1)\
+plotshape(short and barstate.isconfirmed and not HA ? rsi[1] : na, style = shape.circle, location = location.absolute, size = size.tiny, color = rsibearcolor, offset = -1)\
+  \
+a = plot(110, display = display.none)\
+b = plot(100, display = display.none)\
+c = plot(0, display = display.none)\
+d = plot(-10, display = display.none)\
+\
+fill(a,b, color = rsi > 70 ? rsibullcolor : (rsi > 50 ? color.new(rsibullcolor, 50) : color.rgb(72, 74, 80)))\
+fill(c,d, color = rsi < 30 ? rsibearcolor : (rsi < 50 ? color.new(rsibearcolor, 50) : color.rgb(72, 74, 80)))\
+\
+plot(showrsima ? rsiMA: na, "RSI-based MA", color=color.rgb(141, 141, 141))\
+rsiUpperBand = hline(70, "RSI Upper Band", color=#787B86)\
+midline = hline(50, "RSI Middle Band", color=color.new(#787B86, 50))\
+rsiLowerBand = hline(30, "RSI Lower Band", color=#787B86)\
+//fill(rsiUpperBand, rsiLowerBand, color=color.rgb(126, 87, 194, 90), title="RSI Background Fill")\
+bbUpperBand = plot(isBB ? rsiMA + ta.stdev(rsi, maLengthInput) * bbMultInput : na, title = "Upper Bollinger Band", color=rsibullcolor)\
+bbLowerBand = plot(isBB ? rsiMA - ta.stdev(rsi, maLengthInput) * bbMultInput : na, title = "Lower Bollinger Band", color=rsibullcolor)\
+fill(bbUpperBand, bbLowerBand, color= isBB ? color.new(color.green, 90) : na, title="Bollinger Bands Background Fill")\
+\
+midLinePlot = plot(50, color = na, editable = false, display = display.none)\
+fill(rsiPlot, midLinePlot, 100, 70, top_color = color.new(rsibullcolor, 0), bottom_color = color.new(rsibullcolor, 100),  title = "Overbought Gradient Fill")\
+fill(rsiPlot, midLinePlot, 30,  0,  top_color = color.new(rsibearcolor, 100), bottom_color = color.new(rsibearcolor, 0),      title = "Oversold Gradient Fill")\
+\
+//////////HA\
+\
+o_rsi = rsi[1]\
+h_rsi = math.max(rsi, rsi[1])\
+l_rsi = math.min(rsi, rsi[1])\
+c_rsi = rsi\
+\
+haClose = (o_rsi + h_rsi + l_rsi + c_rsi) / 4\
+haOpen = float(na)\
+haOpen := na(haOpen[1]) ? (o_rsi + c_rsi) / 2 : (nz(haOpen[1]) + nz(haClose[1])) / 2\
+haHigh = math.max(h_rsi, math.max(haOpen, haClose))\
+haLow = math.min(l_rsi, math.min(haOpen, haClose))\
+\
+plotcandle(haOpen, haHigh, haLow, haClose, "Heiken Ashi RSI", haClose > haOpen ? rsibullcolor : rsibearcolor, haClose > haOpen ? rsibullcolor : rsibearcolor, bordercolor = haClose > haOpen ? rsibullcolor : rsibearcolor, display = HA ? display.all : display.none)\
+////// Reversals\
+\
+plotchar(ta.crossover(rsi, rsi[1]) and rsi < 20 ? -20 : na, char = "
+\f1 \'a1\'f8
+\f0 ", color = rsibullcolor, location = location.absolute, size = size.tiny)\
+plotchar(ta.crossunder(rsi, rsi[1]) and rsi > 80 ? 120 : na, char = "
+\f2 \uc0\u9660 
+\f0 ", color = rsibearcolor, location = location.absolute, size = size.tiny)}

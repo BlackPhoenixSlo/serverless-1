@@ -1,0 +1,83 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2638
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;\f1\fnil\fcharset0 AppleSymbols;\f2\fnil\fcharset134 PingFangSC-Regular;
+\f3\fnil\fcharset0 LucidaGrande;\f4\fnil\fcharset0 STIXGeneral-Regular;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 // This source code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/\
+// \'a9 Algo_Alert\
+\
+//@version=5\
+indicator(title="
+\f1 \uc0\u10780 
+\f0  Momentum Swing Algorithm [Algo Alert]", format=format.price, precision=2, overlay = true)\
+period_ = input.int(20, title="Length", minval=1)\
+bound = input.int(200, title="Trend Threshold", minval=1)\
+mult = input.float(1.8, title="TP Threshold Multiplier", minval=1)\
+ovrly = input.bool(true, "Overlay Mode")\
+green = input.color(#00ffbb, "Up Color") //#00ffbb\
+red = input.color(#ff1100, "Down Color") //#ff1100\
+ngreen = input.color(#bababa, "Neutral Up Color") //#00ffbb\
+nred = input.color(#676767, "Neutral Down Color") //#ff1100\
+\
+barsback = period_/2 + 1\
+ma = ta.sma(close, period_)\
+dpo = close - ma[barsback]\
+sd = dpo / (ta.ema(high - low, period_)) * 100\
+\
+\
+candlecolor = sd > bound ? green : sd < -bound ? red : close > open ? ngreen : nred\
+\
+plot(sd, color = sd > bound ? green : sd < -bound ? red : color.gray, style = plot.style_columns, display = not ovrly ? display.all : display.none)\
+hline(bound, color = color.white, display = not ovrly ? display.all : display.none)\
+hline(-bound, color = color.white, display = not ovrly ? display.all : display.none)\
+plot(bound*mult, color = color.white, display = not ovrly ? display.all : display.none)\
+plot(-bound*mult, color = color.white, display = not ovrly ? display.all : display.none)\
+\
+plotcandle(open, high, low, close, "candle color", candlecolor, candlecolor, bordercolor = candlecolor, display = ovrly ? display.all : display.none)\
+\
+//plotshape(ta.crossover(sd, bound) and ovrly, title = "bullish tp Signal", color = color.new(green, 30), textcolor = color.rgb(255, 255, 255), text = "
+\f2 \'a1\'f8
+\f0 ", style = shape.labelup, location = location.belowbar, size = size.tiny, display = ovrly ? display.all : display.none)\
+//plotshape(ta.crossunder(sd, -bound) and ovrly, title = "bearish tp Signal", color = color.new(red, 30), textcolor = color.rgb(255, 255, 255), text = "
+\f3 \uc0\u9660 
+\f0 ", style = shape.labeldown, location = location.abovebar, size = size.tiny, display = ovrly ? display.all : display.none)\
+plotchar(ta.crossover(sd, -bound*mult) and ovrly, title = "bullish Take-Profit Signal", char = "
+\f2 \'a1\'f8
+\f0 ", text = "
+\f4 \uc0\u55349 \u56547 \u55349 \u56543 
+\f0 ", color = color.new(green, 30), textcolor = color.rgb(255, 255, 255), location = location.belowbar, size = size.tiny, display = ovrly ? display.all : display.none)\
+plotchar(ta.crossunder(sd, bound*mult) and ovrly, title = "bearish Take-Profit Signal", char = "
+\f3 \uc0\u9660 
+\f0 ", text = "
+\f4 \uc0\u55349 \u56547 \u55349 \u56543 
+\f0 ", color = color.new(red, 30), textcolor = color.rgb(255, 255, 255), location = location.abovebar, size = size.tiny, display = ovrly ? display.all : display.none)\
+plotchar(ta.crossover(sd, -bound*mult) and not ovrly ? -bound*mult*1.5 : na, title = "bullish Take-Profit Signal", char = "
+\f2 \'a1\'f8
+\f0 ", color = color.new(green, 30), textcolor = color.rgb(255, 255, 255), location = location.absolute, size = size.tiny, display = not ovrly ? display.all : display.none)\
+plotchar(ta.crossunder(sd, bound*mult) and not ovrly ? bound*mult*1.5 : na, title = "bearish Take-Profit Signal", char = "
+\f3 \uc0\u9660 
+\f0 ", color = color.new(red, 30), textcolor = color.rgb(255, 255, 255), location = location.absolute, size = size.tiny, display = not ovrly ? display.all : display.none)\
+\
+tops = ta.highest(sd, 3) > 0 ? ta.highest(sd, 3) : 0\
+bottoms = ta.lowest(sd, 3) < 0 ? ta.lowest(sd, 3) : 0\
+var topsindex = array.new_float(2, 0)\
+var bottomsindex = array.new_float(2, 0)\
+\
+if tops[1] > tops\
+    array.insert(topsindex, 0, tops)\
+\
+if bottoms[1] < bottoms\
+    array.insert(bottomsindex, 0, bottoms)\
+\
+//plot(array.avg(topsindex), color = green, display = not ovrly ? display.all : display.none)\
+//plot(array.avg(bottomsindex), color = red, display = not ovrly ? display.all : display.none)\
+\
+alertcondition(ta.crossover(sd, -bound*mult), "bullish Take-Profit Signal")\
+alertcondition(ta.crossunder(sd, bound*mult), "bearish Take-Profit Signal")\
+alertcondition(ta.crossover(sd, bound), "bullish trend")\
+alertcondition(ta.crossunder(sd, -bound), "bearish trend")\
+alertcondition(ta.crossover(sd, -bound), "from downtrend back to consolidation")\
+alertcondition(ta.crossunder(sd, bound), "from uptrend back to consolidation")}

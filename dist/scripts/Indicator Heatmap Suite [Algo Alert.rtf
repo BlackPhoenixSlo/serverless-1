@@ -1,0 +1,162 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2638
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;\f1\fnil\fcharset129 AppleSDGothicNeo-Regular;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 // This source code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/\
+// \'a9 Algo_Alert\
+\
+//@version=5\
+indicator("
+\f1 \'a2\'c9
+\f0  Indicator Heatmap Suite [Algo Alert]")\
+\
+///////////////////////////////////INPUTS\
+theme = input.string("INFRA3", options = ["NEON", "ALGOALERT", "NV", "INFRA", "INFRA2", "INFRA3"], group = "Display Settings")\
+themelight = theme == "NEON" ? #ff1100 : (theme == "ALGOALERT" ? #ffeb3b : (theme == "NV" ? #70ccbd : (theme == "INFRA" ? #ff1100 : (theme == "INFRA2" ? #ffffff : #ff1100) ) ) )\
+themedark = theme == "NEON" ? #00baff : (theme == "ALGOALERT" ? #ff0057 : (theme == "NV" ? #00332a : (theme == "INFRA" ? #2c080c : (theme == "INFRA2" ? #000000 : #0045ff) ) ) )\
+heattype = input.string("Light Hot", options = ["Light Hot", "Dark Hot"], title = "Heat Type", tooltip = "Determines if brighter colors should be used to mark overbought conditions or not", group = "Display Settings")\
+ut = input.bool(true, "Use Preset Color Theme", group = "Display Settings")\
+oversoldcol = not ut ? input.color(#00baff, "Custom Up Color", group = "Display Settings") : (heattype == "Light Hot" ? themedark : themelight)\
+overboughtcol = not ut ?  input.color(#ff1100, "Custom Down Color", group = "Display Settings") : (heattype != "Light Hot" ? themedark : themelight)\
+\
+compt = input.string("Indicator Length", options = ["Indicator Length", "Indicator Type"], title = "Comparison Type", group = "Calaculation Parameters", tooltip = "Determines what variable the heatmap uses for comparison")\
+indtype = input.string("MFI", options = ["RSI", "MFI", "BBPCT", "STOCH"], title = "Indicator Type", group = "Calaculation Parameters", tooltip = "Use this if Comparison Type is 'Indicator Length'")\
+src = input.source(close, "RSI Source", group = "Calaculation Parameters")\
+srcc = input.source(hlc3, "MFI Source", group = "Calaculation Parameters")\
+srccc = input.source(close, "BBPCT Source", group = "Calaculation Parameters")\
+srcccc = input.source(close, "STOCH Source", group = "Calaculation Parameters")\
+lenn = input.int(14, title="Universal Length", group = "Calaculation Parameters", tooltip = "Use this if Comparison Type is 'Indicator Type'")\
+len9 = input.int(30, title="Length 10", group = "Calaculation Parameters")\
+len8 = input.int(27, title="Length 9", group = "Calaculation Parameters")\
+len7 = input.int(24, title="Length 8", group = "Calaculation Parameters")\
+len6 = input.int(21, title="Length 7", group = "Calaculation Parameters")\
+len5 = input.int(18, title="Length 6", group = "Calaculation Parameters")\
+len4 = input.int(15, title="Length 5", group = "Calaculation Parameters")\
+len3 = input.int(12, title="Length 4", group = "Calaculation Parameters")\
+len2 = input.int(9, title="Length 3", group = "Calaculation Parameters")\
+len1 = input.int(6, title="Length 2", group = "Calaculation Parameters")\
+len = input.int(3, title="Length 1", group = "Calaculation Parameters")\
+\
+///////////////////////////////////CALCULATIONS\
+mult = 2\
+bbpct(source, leng) =>\
+    basis = ta.sma(source, leng)\
+    dev = mult * ta.stdev(source, leng)\
+    upper = basis + dev\
+    lower = basis - dev\
+    bbr = (source - lower)/(upper - lower)\
+    bbr*100\
+\
+r = ta.rsi(src, len)\
+r1 = ta.rsi(src, len1)\
+r2 = ta.rsi(src, len2)\
+r3 = ta.rsi(src, len3)\
+r4 = ta.rsi(src, len4)\
+r5 = ta.rsi(src, len5)\
+r6 = ta.rsi(src, len6)\
+r7 = ta.rsi(src, len7)\
+r8 = ta.rsi(src, len8)\
+r9 = ta.rsi(src, len9)\
+r10 = ta.rsi(src, lenn)\
+\
+m = ta.mfi(srcc, len)\
+m1 = ta.mfi(srcc, len1)\
+m2 = ta.mfi(srcc, len2)\
+m3 = ta.mfi(srcc, len3)\
+m4 = ta.mfi(srcc, len4)\
+m5 = ta.mfi(srcc, len5)\
+m6 = ta.mfi(srcc, len6)\
+m7 = ta.mfi(srcc, len7)\
+m8 = ta.mfi(srcc, len8)\
+m9 = ta.mfi(srcc, len9)\
+m10 = ta.mfi(srcc, lenn)\
+\
+b = bbpct(srccc, len)\
+b1 = bbpct(srccc, len1)\
+b2 = bbpct(srccc, len2)\
+b3 = bbpct(srccc, len3)\
+b4 = bbpct(srccc, len4)\
+b5 = bbpct(srccc, len5)\
+b6 = bbpct(srccc, len6)\
+b7 = bbpct(srccc, len7)\
+b8 = bbpct(srccc, len8)\
+b9 = bbpct(srccc, len9)\
+b10 = bbpct(srccc, lenn)\
+\
+s = ta.stoch(srcccc, high, low, len)\
+s1 = ta.stoch(srcccc, high, low, len1)\
+s2 = ta.stoch(srcccc, high, low, len2)\
+s3 = ta.stoch(srcccc, high, low, len3)\
+s4 = ta.stoch(srcccc, high, low, len4)\
+s5 = ta.stoch(srcccc, high, low, len5)\
+s6 = ta.stoch(srcccc, high, low, len6)\
+s7 = ta.stoch(srcccc, high, low, len7)\
+s8 = ta.stoch(srcccc, high, low, len8)\
+s9 = ta.stoch(srcccc, high, low, len9)\
+s10 = ta.stoch(srcccc, high, low, lenn)\
+\
+///////////////////////////////////PLOTS\
+w = 1\
+p10 = plot(10, linewidth=w, display=display.none)\
+p9 = plot(9, linewidth=w, display=display.none)\
+p8 = plot(8, linewidth=w, display=display.none)\
+p7 = plot(7, linewidth=w, display=display.none)\
+p6 = plot(6, linewidth=w, display=display.none)\
+p5 = plot(5, linewidth=w, display=display.none)\
+p4 = plot(4, linewidth=w, display=display.none)\
+p3 = plot(3, linewidth=w, display=display.none)\
+p2 = plot(2, linewidth=w, display=display.none)\
+p1 = plot(1, linewidth=w, display=display.none)\
+p0 = plot(0, display = display.none)\
+\
+fill(p10, p9, color= color.from_gradient(r9, 0, 100, oversoldcol, overboughtcol), display = indtype == "RSI" and compt == "Indicator Length" ? display.all : display.none)\
+fill(p9, p8, color= color.from_gradient(r8, 0, 100, oversoldcol, overboughtcol), display = indtype == "RSI" and compt == "Indicator Length" ? display.all : display.none)\
+fill(p8, p7, color= color.from_gradient(r7, 0, 100, oversoldcol, overboughtcol), display = indtype == "RSI" and compt == "Indicator Length" ? display.all : display.none)\
+fill(p7, p6, color= color.from_gradient(r6, 0, 100, oversoldcol, overboughtcol), display = indtype == "RSI" and compt == "Indicator Length" ? display.all : display.none)\
+fill(p6, p5, color= color.from_gradient(r5, 0, 100, oversoldcol, overboughtcol), display = indtype == "RSI" and compt == "Indicator Length" ? display.all : display.none)\
+fill(p5, p4, color= color.from_gradient(r4, 0, 100, oversoldcol, overboughtcol), display = indtype == "RSI" and compt == "Indicator Length" ? display.all : display.none)\
+fill(p4, p3, color= color.from_gradient(r3, 0, 100, oversoldcol, overboughtcol), display = indtype == "RSI" and compt == "Indicator Length" ? display.all : display.none)\
+fill(p3, p2, color= color.from_gradient(r2, 0, 100, oversoldcol, overboughtcol), display = indtype == "RSI" and compt == "Indicator Length" ? display.all : display.none)\
+fill(p2, p1, color= color.from_gradient(r1, 0, 100, oversoldcol, overboughtcol), display = indtype == "RSI" and compt == "Indicator Length" ? display.all : display.none)\
+fill(p1, p0, color= color.from_gradient(r, 0, 100, oversoldcol, overboughtcol), display = indtype == "RSI" and compt == "Indicator Length" ? display.all : display.none)\
+\
+fill(p10, p9, color=color.from_gradient(m9, 0, 100, oversoldcol, overboughtcol), display = indtype == "MFI" and compt == "Indicator Length" ? display.all : display.none)\
+fill(p9, p8, color=color.from_gradient(m8, 0, 100, oversoldcol, overboughtcol), display = indtype == "MFI" and compt == "Indicator Length" ? display.all : display.none)\
+fill(p8, p7, color=color.from_gradient(m7, 0, 100, oversoldcol, overboughtcol), display = indtype == "MFI" and compt == "Indicator Length" ? display.all : display.none)\
+fill(p7, p6, color=color.from_gradient(m6, 0, 100, oversoldcol, overboughtcol), display = indtype == "MFI" and compt == "Indicator Length" ? display.all : display.none)\
+fill(p6, p5, color=color.from_gradient(m5, 0, 100, oversoldcol, overboughtcol), display = indtype == "MFI" and compt == "Indicator Length" ? display.all : display.none)\
+fill(p5, p4, color=color.from_gradient(m4, 0, 100, oversoldcol, overboughtcol), display = indtype == "MFI" and compt == "Indicator Length" ? display.all : display.none)\
+fill(p4, p3, color=color.from_gradient(m3, 0, 100, oversoldcol, overboughtcol), display = indtype == "MFI" and compt == "Indicator Length" ? display.all : display.none)\
+fill(p3, p2, color=color.from_gradient(m2, 0, 100, oversoldcol, overboughtcol), display = indtype == "MFI" and compt == "Indicator Length" ? display.all : display.none)\
+fill(p2, p1, color=color.from_gradient(m1, 0, 100, oversoldcol, overboughtcol), display = indtype == "MFI" and compt == "Indicator Length" ? display.all : display.none)\
+fill(p1, p0, color=color.from_gradient(m, 0, 100, oversoldcol, overboughtcol), display = indtype == "MFI" and compt == "Indicator Length" ? display.all : display.none)\
+\
+fill(p10, p9, color=color.from_gradient(b9, 0, 100, oversoldcol, overboughtcol), display = indtype == "BBPCT" and compt == "Indicator Length" ? display.all : display.none)\
+fill(p9, p8, color=color.from_gradient(b8, 0, 100, oversoldcol, overboughtcol), display = indtype == "BBPCT" and compt == "Indicator Length" ? display.all : display.none)\
+fill(p8, p7, color=color.from_gradient(b7, 0, 100, oversoldcol, overboughtcol), display = indtype == "BBPCT" and compt == "Indicator Length" ? display.all : display.none)\
+fill(p7, p6, color=color.from_gradient(b6, 0, 100, oversoldcol, overboughtcol), display = indtype == "BBPCT" and compt == "Indicator Length" ? display.all : display.none)\
+fill(p6, p5, color=color.from_gradient(b5, 0, 100, oversoldcol, overboughtcol), display = indtype == "BBPCT" and compt == "Indicator Length" ? display.all : display.none)\
+fill(p5, p4, color=color.from_gradient(b4, 0, 100, oversoldcol, overboughtcol), display = indtype == "BBPCT" and compt == "Indicator Length" ? display.all : display.none)\
+fill(p4, p3, color=color.from_gradient(b3, 0, 100, oversoldcol, overboughtcol), display = indtype == "BBPCT" and compt == "Indicator Length" ? display.all : display.none)\
+fill(p3, p2, color=color.from_gradient(b2, 0, 100, oversoldcol, overboughtcol), display = indtype == "BBPCT" and compt == "Indicator Length" ? display.all : display.none)\
+fill(p2, p1, color=color.from_gradient(b1, 0, 100, oversoldcol, overboughtcol), display = indtype == "BBPCT" and compt == "Indicator Length" ? display.all : display.none)\
+fill(p1, p0, color=color.from_gradient(b, 0, 100, oversoldcol, overboughtcol), display = indtype == "BBPCT" and compt == "Indicator Length" ? display.all : display.none)\
+\
+fill(p10, p9, color=color.from_gradient(s9, 0, 100, oversoldcol, overboughtcol), display = indtype == "STOCH" and compt == "Indicator Length" ? display.all : display.none)\
+fill(p9, p8, color=color.from_gradient(s8, 0, 100, oversoldcol, overboughtcol), display = indtype == "STOCH" and compt == "Indicator Length" ? display.all : display.none)\
+fill(p8, p7, color=color.from_gradient(s7, 0, 100, oversoldcol, overboughtcol), display = indtype == "STOCH" and compt == "Indicator Length" ? display.all : display.none)\
+fill(p7, p6, color=color.from_gradient(s6, 0, 100, oversoldcol, overboughtcol), display = indtype == "STOCH" and compt == "Indicator Length" ? display.all : display.none)\
+fill(p6, p5, color=color.from_gradient(s5, 0, 100, oversoldcol, overboughtcol), display = indtype == "STOCH" and compt == "Indicator Length" ? display.all : display.none)\
+fill(p5, p4, color=color.from_gradient(s4, 0, 100, oversoldcol, overboughtcol), display = indtype == "STOCH" and compt == "Indicator Length" ? display.all : display.none)\
+fill(p4, p3, color=color.from_gradient(s3, 0, 100, oversoldcol, overboughtcol), display = indtype == "STOCH" and compt == "Indicator Length" ? display.all : display.none)\
+fill(p3, p2, color=color.from_gradient(s2, 0, 100, oversoldcol, overboughtcol), display = indtype == "STOCH" and compt == "Indicator Length" ? display.all : display.none)\
+fill(p2, p1, color=color.from_gradient(s1, 0, 100, oversoldcol, overboughtcol), display = indtype == "STOCH" and compt == "Indicator Length" ? display.all : display.none)\
+fill(p1, p0, color=color.from_gradient(s, 0, 100, oversoldcol, overboughtcol), display = indtype == "STOCH" and compt == "Indicator Length" ? display.all : display.none)\
+\
+fill(p4, p3, color=color.from_gradient(r10, 0, 100, oversoldcol, overboughtcol), display = compt == "Indicator Type" ? display.all : display.none)\
+fill(p3, p2, color=color.from_gradient(m10, 0, 100, oversoldcol, overboughtcol), display = compt == "Indicator Type" ? display.all : display.none)\
+fill(p2, p1, color=color.from_gradient(b10, 0, 100, oversoldcol, overboughtcol), display = compt == "Indicator Type" ? display.all : display.none)\
+fill(p1, p0, color=color.from_gradient(s10, 0, 100, oversoldcol, overboughtcol), display = compt == "Indicator Type" ? display.all : display.none)}

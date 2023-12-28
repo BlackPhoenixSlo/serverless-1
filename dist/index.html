@@ -1,14 +1,474 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Serverless Tutorial</title>
-    <link rel="stylesheet" href="css/main.css">
-    <script defer src="js/main.js"></script>
+    <title>AlgoAlert</title>
+    <link rel="stylesheet" href="css.css">
+    <script async defer src="https://apis.google.com/js/api.js"></script>
+
+
 </head>
+
 <body>
-    <h1 class="fade-in"></h1>
+    <!-- Header Section -->
+    <header>
+        <div class="header-top">
+            <p> There are many Algo* sites, this one is the first, the best, let's rock it together. Here you see the
+                real proof (front test) not just a pure TV backtested printsceen. Have fun, learn and go kill it!</p>
+        </div>
+        <nav>
+            <div class="logo">AlgoAlert</div>
+            <ul class="menu">
+                <ul class="menu">
+
+                    <li><a href="#algo-bots">Algo-Bots</a></li>
+                    <li><a href="#google-sheets">Google Sheets</a></li>
+                    <li><a href="#code-snippets">Code Snippets</a></li>
+                    <li><a href="#create-indicator">Create Indicator</a></li>
+                    <li><a href="#hidden-gems">Hidden Gems</a></li>
+                    <li><a href="#next-steps">Next Steps</a></li>
+                    <!-- Add more menu items as needed -->
+                </ul>
+                <!-- Add more menu items as needed -->
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <div class="content">
+        <div class="left-right-section">
+            <div class="left">
+                <!-- Add image with hover and link -->
+                <a
+                    href="https://docs.google.com/spreadsheets/d/1SZwDpZO7rvLrijKq9dtgdOP4tffr-KzhQB1JsPXBj8I/edit?usp=sharing">
+                    <img src="imgs/TPI-logo.png" alt="Image Description" class="hover-image"
+                        data-hover="imgs/TPI-bybit.png">
+                </a>
+            </div>
+            <div class="right">
+                <!-- Text content -->
+                <p class="bot-signal">BTC position: ...</p>
+                <p class="eth-position">Eth position: ...</p>
+                <p class="total-profit">Total profit: ...</p>
+                <!-- More text elements -->
+            </div>
+        </div>
+
+        <!-- Repeat similar structure for other sections -->
+        <!-- ... -->
+    </div>
+
+    <!-- Benefits of Joining Discord Section -->
+    <div class="left-right-section" id="benefits-discord">
+        <div class="left" style="display: flex;">
+
+            <div class="left-right-section left-email " id="benefits-discord">
+
+                <div class="left">
+                    <h3>Benefits of Joining Discord</h3>
+                    <p><b>Real-Time Communication</b> </p>
+                    <p><b>Networking Opportunities</b> </p>
+                    <p><b>Access to Exclusive Content</b> </p>
+
+                    <p><b>Expert Insights</b> </p>
+
+                    <p><b>Up-to-Date Information</b> </p>
+
+                    <p><b>Community Support</b> </p>
+
+                    <p><b>Special Events</b> </p>
+
+                    <p><b>Collaboration</b> </p>
+                    <p><b>Diverse Perspectives</b> </p>
+
+                    <p><b>A Safe and Inclusive Environment</b> </p>
+
+                </div>
+
+            </div>
+            <div class="right right-discord">
+                <a href="https://discord.gg/kaNwaZ6Y" class="discord-link">Join Our Discord Server</a>
+            </div>
+
+            <!-- Email Signup Section -->
+
+
+        </div>
+        <div class="right">
+            <!-- Email Signup Section -->
+            <div class="left-right-section " id="email-signup">
+                <div class="left left-email " style="margin: auto;">
+                    <h3>Email me here to Signup</h3>
+                    <a href="mailto:signup@algoalert.net">signup@algoalert.net</a>
+                    <p>Tell me, what'd you like to sign up for.</p>
+
+
+                </div>
+                <div class="right right-discord">
+                    <h3>Benefits of Joining the Email List</h3>
+                    <p><b>Expert Insights</b> </p>
+
+                    <p><b>Dope market Calls</b> </p>
+
+                    <p><b>Lazy signals</b> </p>
+
+
+                    <p><b>Event Invitations</b> </p>
+
+
+                    <p><b>Community Highlights</b> </p>
+
+                    <p><b>Personalized Content</b> </p>
+
+
+                    <p><b>Free Ebook & Courses</b> </p>
+                    <p><b>Convenience</b> </p>
+
+                    <p>
+                        <!-- List benefits here -->
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- Algo-Bots and Automatisation Section -->
+    <h2 id="algo-bots">Algo-Bots and Automatisation</h2>
+    <div class="left-right-section">
+        <div class="left">
+            <h3>TradeSync Automator</h3>
+            <p>TradeSync Automator is a comprehensive solution that seamlessly bridges the gap between backtesting and
+                front testing. <br> This tool effortlessly imports data from TradingView (TV) into Google Sheets
+                (GSheets) for detailed backtesting analysis. It then transitions into real-time front testing,
+                automating and optimizing trade strategies with precision. <br><br> Designed for both novice and
+                experienced traders, TradeSync Automator is your go-to tool for refining and executing profitable
+                trading tactics.</p>
+            <a href="https://github.com/BlackPhoenixSlo/fecth-data-tv-to-sheets/tree/main">
+                <img src="imgs/back-fronttest.png" alt="Bot Data" class="hover-image"
+                    data-hover="imgs/fronttesting1.png">
+            </a>
+        </div>
+        <div class="right">
+            <h3>CryptoPilot Bot (Comming)</h3>
+            <p>CryptoPilot Bot is an advanced, fully automated trading bot engineered for the dynamic world of
+                cryptocurrency markets.<br> This state-of-the-art bot employs sophisticated algorithms to analyze market
+                trends, execute trades, and manage portfolios around the clock. With its intelligent design and
+                autonomous operation, CryptoPilot Bot empowers traders to capitalize on market opportunities, minimize
+                risks, and achieve their investment goals with unparalleled efficiency. <br><br> Get ready to elevate
+                your trading experience with CryptoPilot Bot – your 24/7 crypto trading expert. Free</p>
+            <a href="">
+                <img src="imgs/autobot1.png" alt="Total Bot" class="hover-image" data-hover="imgs/auto-bot2.png">
+            </a>
+        </div>
+    </div>
+
+    <!-- Useful Google Sheets Section -->
+    <h2>Useful Google Sheets</h2>
+    <div class="grid-section" id="google-sheets">
+        <!-- Repeat this structure for each sheet -->
+
+        <div class="grid-item">
+            <h3>TimeFrame Transformer</h3>
+            <p>Split to Lower Timeframe</p>
+            <a
+                href="https://docs.google.com/spreadsheets/d/1dwx7IuKTXRXRmBlzOeKywGEaLwsB_WVCrWy4V6BnZbY/edit?usp=sharing">
+                <img src="imgs/to-lowerTf.png" alt="Sheet Description" class="hover-image"
+                    data-hover="imgs/toLowerTc.png">
+            </a>
+        </div>
+        <div class="grid-item">
+            <h3>Indicator Fusion Fundamentals</h3>
+            <p>Combining Indicators with Market Cap & Correlation</p>
+            <a
+                href="https://docs.google.com/spreadsheets/d/1TLjK4x9QIhPQwWffEA2gCt7pOX8Taw8Sqq1fkex1neU/edit?usp=sharing">
+                <img src="imgs/combine-tradingindicators.png" alt="Sheet Description" class="hover-image"
+                    data-hover="imgs/Combining-indicators-basic.png">
+            </a>
+        </div>
+
+        <div class="grid-item">
+            <h3>Combining Indicators with Market Cap & Correlation</h3>
+            <p>Combining Indicators Basic</p>
+            <a
+                href="https://docs.google.com/spreadsheets/d/1zvAJoBNmiEbU3e8BcZZiqlHapeOM9QS57OCgcKKdakA/edit?usp=sharing">
+                <img src="imgs/combine-tradingindicators2.png" alt="Sheet Description" class="hover-image"
+                    data-hover="imgs/Combining-ndicator-w-Mcap.png">
+            </a>
+        </div>
+
+        <div class="grid-item">
+            <h3>Crypto Allocation Analyst</h3>
+            <p>Combining Trading 2 Coins for Dynamic Allocation</p>
+            <a
+                href="https://docs.google.com/spreadsheets/d/1VGm83pS7o7jszTE7Ewk8Va2FbdGmFm_JuzFgAlm4ddM/edit?usp=sharing">
+                <img src="imgs/dinamicallo1.png" alt="Sheet Description" class="hover-image"
+                    data-hover="imgs/Cobining2tradingPairsTogether.png">
+            </a>
+        </div>
+
+        <!-- <div class="grid-item">
+            <h3>Dual Spread Strategy Lab</h3>
+            <p>Combine Two Dynamic Spread Tradings Together</p>
+
+            <a
+                href="https://docs.google.com/spreadsheets/d/1LvkJslF8aQHpXZfOPqxmCDDSOFfBC_s-qWflrAhWKgY/edit?usp=sharing">
+                <img src="imgs/dynamicallo2.png" alt="Sheet Description" class="hover-image"
+                    data-hover="imgs/CobiningTradingEqutiesofpairsTogetherynamicAlocation.png">
+            </a>
+        </div> -->
+
+        <div class="grid-item">
+            <h3>Fundamentals Discretionary</h3>
+            <p> Collect fundamentals and combine them... buy gold when war&hungar&badelarticity&...</p>
+            <a
+                href="https://docs.google.com/spreadsheets/d/1wQhV66rqVaCxR3SOKqgLY0gUi5JR5uhElOyJ66C_nt0/edit?usp=sharing">
+                <img src="imgs/commingsoon1.png" alt="Sheet Description" class="hover-image"
+                    data-hover="imgs/CobiningTradingEqutiesofpairsTogetherynamicAlocation.png">
+            </a>
+        </div>
+
+        <!-- Add more grid items -->
+    </div>
+
+    <!-- Useful Code Snippets Section -->
+    <h2>Useful Code Snippets</h2>
+    <div class="grid-section2" id="code-snippets">
+        <!-- Repeat this structure for each code snippet -->
+        <div class="grid-item">
+            <h3>Fourier</h3>
+
+            <a href="pdfs/fourier.pdf">
+                <img src="imgs/Fourier-Transformation.png" alt="Code Snippet Description" class="hover-image"
+                    data-hover="imgs/fastfuriur.png">
+            </a>
+        </div>
+        <div class="grid-item">
+            <h3>Wavelet</h3>
+
+            <a href="pdfs/IEEEwavelet.pdf">
+                <img src="imgs/Wavelet-transform.png" alt="Code Snippet Description" class="hover-image"
+                    data-hover="imgs/wavelet.png">
+            </a>
+        </div>
+
+        <div class="grid-item">
+            <h3>Euler</h3>
+
+            <a href="pdfs/Eulers_Theorem_for_Homogeneous_White_Noise_Operat.pdf">
+                <img src="imgs/Euler-transformation.png" alt="Code Snippet Description" class="hover-image"
+                    data-hover="imgs/euler.png">
+            </a>
+        </div>
+
+        <div class="grid-item">
+            <h3>Edward</h3>
+
+            <a href="pdfs/zScores_HANDOUT.pdf">
+                <img src="imgs/z-score2.png" alt="Code Snippet Description" class="hover-image"
+                    data-hover="imgs/zScore.png">
+            </a>
+        </div>
+
+        <!-- Add more grid items -->
+    </div>
+
+    <!-- Create Your Own Indicator Section -->
+    <h2>Create Your Own Indicator</h2>
+    <div class="centered-section size500" id="create-indicator">
+        <div>
+            <h3>For example, start with the w3q indicator:</h3>
+            <div class="image-section">
+                <p class="image-description">
+                    Here we have the best web3 Quant indicator.
+                </p>
+                <a href="https://www.tradingview.com/script/lxOEdVih-HMA-with-Simplified-Color-Coding/">
+                    <img src="imgs/w3q1.png" alt="Code Image" class="hover-image" data-hover="imgs/basic-hma.png">
+                </a>
+            </div>
+
+            <div class="image-section">
+                <p class="image-description">
+                    With a bit of Promting wi get a bit better indicator
+                </p>
+                <a
+                    href="https://www.tradingview.com/script/odHGwxEw-Fisher-Transformed-HMA-with-Color-Coding-Chat-GPT/">
+                    <img src="imgs/w3q2.png" alt="Code Image" class="size500 hover-image"
+                        data-hover="imgs/w3q2-script.png">
+                </a>
+            </div>
+
+            <div class="image-section">
+                <p class="image-description">
+                    With adding special Math sections from above.
+                </p>
+                <a href="https://www.tradingview.com/script/5zSEGAQ5-Fisher-Transformed-HMA-with-Color-Coding/">
+                    <img src="imgs/w3q3.png" alt="Code Image" class="size500 hover-image "
+                        data-hover="imgs/w3q2-script.png">
+                </a>
+            </div>
+        </div>
+
+        <!-- Repeat for other images and texts -->
+    </div>
+
+
+    <h2>Hidden Gems</h2>
+
+    <div class="centered-section" id="hidden-gems">
+
+
+        <p>Use FSVZO or any other indicator or more than 1 timframe. Use googlesheets to combine it all together.</p>
+        <ul>
+            <li><a href="scripts/ Enhanced FSVZO (FSVZO V2) [Algo Alert].rtf"> Enhanced FSVZO (FSVZO V2) [Algo Alert]
+                </a></li>
+            <li><a href="scripts/ↈↇↁ Fourier Smoothed Stochastic [Algo Alert] (private draft) .rtf">ↈↇↁ Fourier Smoothed
+                    Stochastic [Algo Alert] (private draft) </a></li>
+
+            <li><a href="scripts/ Wavelet Momentum Reversal (WMR) [Algo Alert].rtf">Wavelet Momentum Reversal (WMR)
+                    [Algo Alert]</a></li>
+
+            <li><a href="scripts/ Trend Flow Profile (TFP) [Algo Alert].rtf">Trend Flow Profile (TFP) [Algo Alert]</a>
+            </li>
+
+            <li><a href="scripts/Amazing Oscillator [Algo Alert].rtf">Amazing Oscillator [Algo Alert</a></li>
+
+            <li><a href="scripts/Asset Risk Analysis [Algo Alert].rtf">Asset Risk Analysis [Algo Alert]</a></li>
+
+            <li><a href="scripts/Bitcoin MVRV Channels [Algo Alert].rtf">Bitcoin MVRV Channels [Algo Alert]</a></li>
+
+            <li><a href="scripts/BTC Supply in Profits and Losses (BTCSPL) [Algo Alert].rtf">BTC Supply in Profits and
+                    Losses (BTCSPL) [Algo Alert]</a></li>
+
+            <li><a href="scripts/F Stocastic.rtf">F Stocastic</a></li>
+
+            <li><a href="scripts/Fourier Smoothed Relative Strength Index (FRSI) [Algo Alert].rtf">Fourier Smoothed
+                    Relative Strength Index (FRSI) [Algo Alert]</a></li>
+
+            <li><a href="scripts/Fourier Smoothed Stochastic (FSTOCH) [Algo Alert].rtf"></a>Fourier Smoothed Stochastic
+                (FSTOCH) [Algo Alert]</li>
+
+            <li><a href="scripts/Indicator Heatmap Suite [Algo Alert.rtf">Indicator Heatmap Suite [Algo Alert</a></li>
+
+            <li><a href="scripts/Limited Growth Stock-to-Flow (LG-S2F) [Algo Alert].rtf">Limited Growth Stock-to-Flow
+                    (LG-S2F) [Algo Alert]</a></li>
+
+            <li><a href="scripts/Liquidity Guppy [Algo Alert].rtf">Liquidity Guppy [Algo Alert]</a></li>
+
+            <li><a href="scripts/Liquidity Weighted Moving Averages [Algo Alert].rtf">Liquidity Weighted Moving Averages
+                    [Algo Alert]</a></li>
+
+
+
+            <li><a href="scripts/Momentum Bias Index [Algo Alert].rtf">Momentum Bias Index [Algo Alert]</a></li>
+
+            <li><a href="scripts/Momentum Swing Algorithm [Algo Alert].rtf">Momentum Swing Algorithm [Algo Alert]</a>
+            </li>
+
+            <li><a href="scripts/Regressive Ranges [Algo Alert].rtf">Regressive Ranges [Algo Alert]</a></li>
+
+            <li><a href="scripts/Retracement Sniper [Algo Alert].rtf">Retracement Sniper [Algo Alert]</a></li>
+
+
+            <li><a href="scripts/Squeeze & Release [Algo Alert].rtf">Squeeze & Release [Algo Alert]</a></li>
+            <li><a href="scripts/Standardized Orderflow [Algo Alert].rtf">Standardized Orderflow [Algo Alert]</a></li>
+
+            <li><a href="scripts/Super Fisher [Algo Alert].rtf">Super Fisher [Algo Alert]</a></li>
+
+            <li><a href="scripts/Super Schaff [Algo Alert].rtf">Super Schaff [Algo Alert]</a></li>
+
+            <li><a href="scripts/Standardized Orderflow [Algo Alert].rtf">Standardized Orderflow [Algo Alert]</a></li>
+
+            <li><a href="scripts/Trend Intensity Exhaustion (TIE) [Algo Alert].rtf">Trend Intensity Exhaustion (TIE)
+                    [Algo Alert]</a></li>
+
+            <li><a href="scripts/Volume Trend Tracker (VTT) [Algo Alert].rtf">Volume Trend Tracker (VTT) [Algo
+                    Alert]</a></li>
+
+            <li><a href="scripts/Volume-Trend Sentiment (VTS) [Algo Alert].rtf">Volume-Trend Sentiment (VTS) [Algo
+                    Alert]</a></li>
+
+            <li><a href="scripts/Wavelet Smoothed Relative Strength Index [Algo Alert].rtf">Wavelet Smoothed Relative
+                    Strength Index [Algo Alert]</a></li>
+            <li><a href="scripts/Wavelet Smoothed Volume Zone Oscillator (WVZO) [Algo Alert].rtf">Wavelet Smoothed
+                    Volume Zone Oscillator (WVZO) [Algo Alert]</a></li>
+
+            <li><a href="scripts/WaveTrend Z-Score [Algo Alert].rtf">WaveTrend Z-Score [Algo Alert]</a></li>
+
+            <li><a href="scripts/Whipsaw Resistant Trend Cloud [Algo Alert].rtf">Whipsaw Resistant Trend Cloud [Algo
+                    Alert]</a></li>
+
+
+
+
+
+
+            <!-- Add more list items with links -->
+        </ul>
+
+
+    </div>
+
+    <!-- What is the Next Step? Section -->
+    <h2>What is the Next Step?</h2>
+    <div class="centered-section" id="next-steps">
+        <p>Enjoy your life? Learn more and invest in your system. Here's how:</p>
+        <ul>
+            <li><a href="#benefits-discord">Join our Discord Community</a></li>
+            <li><a href="#email-signup">Join our Mailing list</a></li>
+            <li><a href="https://www.youtube.com/@c0tt0nc4ndyTA">Learn Cott0nC4ndy L1-3</a></li>
+            <li><a href="https://www.youtube.com/watch?v=glHr2Xr2sWc">Learn Risk and Money Management</a></li>
+            <li><a href="https://youtube.com/watch?v=SytKPVGVt6s&feature=share">Learn Gigachad strategy and FVG</a></li>
+            <li><a href="https://itpm.com">Learn Hedge fund investing</a></li>
+            <!-- Add more list items with links -->
+        </ul>
+    </div>
+
+    <!-- Add more sections as needed -->
+
+
+    <!-- Enhanced Footer Section -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section about">
+                <h3>AlgoAlert</h3>
+                <p>AlgoAlert is dedicated to providing top-tier trading tools and resources, empowering traders in the
+                    digital age. Our mission is to democratize trading technology for everyone.</p>
+                <!-- Add your logo below -->
+            </div>
+
+            <div class="footer-section links">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="#benefits-discord">Benefits of Discord</a></li>
+                    <li><a href="#email-signup">Email Signup</a></li>
+                    <li><a href="#algo-bots">Algo-Bots</a></li>
+                    <!-- Add more links as needed -->
+                </ul>
+            </div>
+
+            <div class="footer-section contact">
+                <h4>Contact Us</h4>
+                <ul>
+                    <li>Email: contact@algoalert.net</li>
+                    <li>Phone: +123 456 7890</li>
+                    <!-- Add more contact details as needed -->
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>© 2023 AlgoAlert - All Rights Reserved</p>
+            <a href="">Run bot</a>
+        </div>
+    </footer>
+
+    <script src="js/index.js"></script>
+    <script src="js/main.js"></script>
+
 </body>
+
 </html>

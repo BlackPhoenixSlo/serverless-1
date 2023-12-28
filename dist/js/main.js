@@ -6,12 +6,22 @@ const fetchData = async () => {
 };
 
 const displayData = (data) => {
-  const h1 = document.querySelector("h1");
   // Assuming data is an array of arrays, and you want to display the first row's values
-  h1.textContent = data[0].join(', '); // This will display the array values as a comma-separated string
+  
+ 
+        document.querySelector('.bot-signal').textContent = "Bot signal: " + data[0][0];
+        document.querySelector('.eth-position').textContent = "Eth position: " + data[0][1];
+        document.querySelector('.total-profit').textContent = "Total profit: " + data[0][2];
+
+
+
+
 };
 
 const refreshData = async () => {
+  document.querySelector('.bot-signal').textContent = "Bot signal: Loading." ;
+  document.querySelector('.eth-position').textContent = "Eth position: Loading.. " ;
+  document.querySelector('.total-profit').textContent = "Total profit: Loading...";
   const data = await fetchData();
   displayData(data);
 };

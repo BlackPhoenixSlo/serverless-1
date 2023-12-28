@@ -1,0 +1,94 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2638
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;\f1\fnil\fcharset0 STIXGeneral-Regular;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 // This source code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/\
+// \'a9 Algo_Alert\
+\
+//@version=5\
+indicator("
+\f1 \uc0\u55349 \u56701 \u55349 \u56714 \u55349 \u56716 \u55349 \u56727 \u55349 \u56714 \u55349 \u56728 \u55349 \u56728 \u55349 \u56718 \u55349 \u56731 \u55349 \u56714 
+\f0  
+\f1 \uc0\u55349 \u56701 \u55349 \u56710 \u55349 \u56723 \u55349 \u56716 \u55349 \u56714 \u55349 \u56728 
+\f0  [Algo Alert]", overlay = true, precision = 10)\
+leng = input.int(200, minval = 133, title = "Lookback Length")\
+factor = input.int(2, minval = 2, title = "Range Width Sensitivity Factor")\
+mult = input.int(2, minval = 1, title = "Deviation Bands Multiplier")\
+showfib = input.bool(false, "Show Fibonacci Levels")\
+green = input.color(#00ffbb, "Range Low Color")\
+red = input.color(#ff1100, "Range High Color")\
+green1 = input.color(#00ffbb, "Bands Low Color")\
+red1 = input.color(#ff1100, "Bands High Color")\
+fibcol = input.color(#6b6b6b74, "Fibonacci Levels Color")\
+highh = ta.highest(leng/factor)\
+loww = ta.lowest(leng/factor)\
+rangge = highh-loww\
+r = ta.linreg(rangge, 70, 0)\
+l = ta.linreg(close, leng, 0)\
+p = math.sum((close+open)/2, 10)/10\
+var hist = array.new_float(leng)\
+var barnow = 0\
+var lnow = 0.0\
+var rnow = 0.0\
+var grad = 0.0\
+var breakk = bool(na)\
+\
+newlinecon = ta.crossover(bar_index, leng) or breakk\
+\
+if newlinecon\
+    grad := (l-close[leng])/(bar_index-(bar_index-leng))\
+    barnow := bar_index\
+    lnow := l\
+    rnow := r\
+\
+val = lnow + (bar_index-barnow) * grad\
+upval = val + rnow\
+downval = val - rnow\
+dev = mult * ta.stdev(close, leng)\
+updev = val + dev\
+downdev = val - dev\
+\
+//////////////////////////////////////////Hard Closes\
+upcandle = close > open\
+downcandle = open > close\
+\
+bhcc = 0\
+bearhcc = 0\
+\
+bullish_hardclose = (bhcc == 0 ? upcandle and open > upval : false) and bar_index > leng\
+bearish_hardclose = (bearhcc == 0 ? downcandle and open < downval : false) and bar_index > leng\
+\
+if bullish_hardclose\
+    bhcc := 1\
+    bearhcc := 0\
+\
+if bearish_hardclose\
+    bhcc := 0\
+    bearhcc := 1\
+\
+breakk := ta.crossover(bhcc, 0.5) or ta.crossover(bearhcc, 0.5)\
+\
+z = plot(grad != 0 ? val : na, color = grad > 0 ? green : red)\
+f = plot(grad != 0 ? upval : na, display = display.none)\
+negf = plot(grad != 0 ? downval : na, display = display.none)\
+x = plot(grad != 0 ? updev : na, display = display.none)\
+y = plot(grad != 0 ? downdev : na, display = display.none)\
+\
+fill(z, f, top_value = upval, bottom_value = val, bottom_color = na, top_color = color.new(red,65))\
+fill(z, negf, top_value = val, bottom_value = downval, bottom_color = color.new(green,65) , top_color = na)\
+fill(z, x, top_value = updev, bottom_value = val, bottom_color = na, top_color = color.new(red1,65))\
+fill(z, y, top_value = val, bottom_value = downdev, bottom_color = color.new(green1,65) , top_color = na)\
+\
+plot(val + (0.236*rnow), color = fibcol, display = showfib ? display.all : display.none)\
+plot(val + (0.382*rnow), color = fibcol, display = showfib ? display.all : display.none)\
+plot(val + (0.5*rnow), color = fibcol, display = showfib ? display.all : display.none)\
+plot(val + (0.618*rnow), color = fibcol, display = showfib ? display.all : display.none)\
+plot(val + (0.764*rnow), color = fibcol, display = showfib ? display.all : display.none)\
+plot(val - (0.236*rnow), color = fibcol, display = showfib ? display.all : display.none)\
+plot(val - (0.382*rnow), color = fibcol, display = showfib ? display.all : display.none)\
+plot(val - (0.618*rnow), color = fibcol, display = showfib ? display.all : display.none)\
+plot(val - (0.764*rnow), color = fibcol, display = showfib ? display.all : display.none)\
+plot(val - (1*rnow), color = fibcol, display = showfib ? display.all : display.none)}

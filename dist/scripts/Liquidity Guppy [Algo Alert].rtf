@@ -1,0 +1,75 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2638
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;\f1\fnil\fcharset0 STIXGeneral-Regular;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 // This source code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/\
+// \'a9 Algo_Alert\
+\
+//@version=5\
+indicator("
+\f1 \uc0\u55349 \u56539 \u55349 \u56562 \u55349 \u56570 \u55349 \u56574 \u55349 \u56562 \u55349 \u56557 \u55349 \u56562 \u55349 \u56573 \u55349 \u56578 
+\f0  
+\f1 \uc0\u55349 \u56534 \u55349 \u56574 \u55349 \u56569 \u55349 \u56569 \u55349 \u56578 
+\f0  [Algo Alert]", overlay = true)\
+liquidity = volume/math.abs(close-open)\
+thresh = input.int(10, "Outlier Threshold Length")\
+length1 = input.int(80, title="MA length 1")\
+length2 = input.int(75, title="MA length 2")\
+length3 = input.int(70, title="MA length 3")\
+length4 = input.int(65, title="MA length 4")\
+length5 = input.int(60, title="MA length 5")\
+length6 = input.int(55, title="MA length 6")\
+length7 = input.int(50, title="MA length 7")\
+length8 = input.int(45, title="MA length 8")\
+length9 = input.int(40, title="MA length 9")\
+length10 = input.int(35, title="MA length 10")\
+length11 = input.int(30, title="MA length 11")\
+length12 = input.int(25, title="MA length 12")\
+length13 = input.int(20, title="MA length 13")\
+length14 = input.int(15, title="MA length 14")\
+length15 = input.int(10, title="MA length 15")\
+length16 = input.int(5, title="MA length 16")\
+green = input.color(#00ffbb, "Up Color") //#00ffbb\
+red = input.color(#ff1100, "Down Color") //#ff1100\
+bound = ta.ema(liquidity,thresh) + ta.stdev(liquidity, thresh)\
+var liq = array.new_float(5)\
+if ta.crossover(liquidity, bound)\
+    array.insert(liq, 0, close)\
+\
+z = ta.ema(array.get(liq, 0), length1)\
+x = ta.ema(array.get(liq, 0), length2)\
+s = ta.ema(array.get(liq, 0), length3)\
+a = ta.ema(array.get(liq, 0), length4)\
+w = ta.ema(array.get(liq, 0), length5)\
+q = ta.ema(array.get(liq, 0), length6)\
+r = ta.ema(array.get(liq, 0), length7)\
+e = ta.ema(array.get(liq, 0), length8)\
+g = ta.ema(array.get(liq, 0), length9)\
+h = ta.ema(array.get(liq, 0), length10)\
+i = ta.ema(array.get(liq, 0), length11)\
+k = ta.ema(array.get(liq, 0), length12)\
+l = ta.ema(array.get(liq, 0), length13)\
+o = ta.ema(array.get(liq, 0), length14)\
+p = ta.ema(array.get(liq, 0), length15)\
+t = ta.ema(array.get(liq, 0), length16)\
+\
+plot(z, color = x > z ? green : red)\
+plot(x, color = x > z ? green : red)\
+plot(s, color = s > x ? green : red)\
+plot(a, color = a > s ? green : red)\
+plot(w, color = w > a ? green : red)\
+plot(q, color = q > w ? green : red)\
+plot(r, color = r > q ? green : red)\
+plot(e, color = e > r ? green : red)\
+plot(g, color = g > e ? green : red)\
+plot(h, color = h > g ? green : red)\
+plot(i, color = i > h ? green : red)\
+plot(k, color = k > i ? green : red)\
+plot(l, color = l > k ? green : red)\
+plot(o, color = o > l ? green : red)\
+plot(p, color = p > o ? green : red)\
+plot(t, color = t > p ? green : red)\
+}
