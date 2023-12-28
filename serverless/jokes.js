@@ -10,18 +10,14 @@ exports.handler = async (event, context) => {
     const auth = await getAuthToken();
     const response = await getSpreadSheetValues({
       spreadsheetId: "1SZwDpZO7rvLrijKq9dtgdOP4tffr-KzhQB1JsPXBj8I",
-      range: 'Overview!D5:F5', // Adjust the range as needed
+      range: 'Overview!D5:F5',
       auth
     });
-
-    const text =  json(response.data.values);
-
 
     return {
       statusCode: 200,
       body: JSON.stringify(response.data.values)
     };
-
   } catch (error) {
     console.error(error);
     return {
