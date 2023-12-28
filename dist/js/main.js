@@ -1,30 +1,22 @@
-const getRandomDadJoke = async () => {
-  // const url = "https://icanhazdadjoke.com/";
-  // const jokeStream = await fetch(url, {
-  //   headers: {
-  //     Accept: "application/json"
-  //   }
-  // }); 
-  const url = "/.netlify/functions/jokes";
-  const jokeStream = await fetch(url);
-  const jsonJoke = await jokeStream.json();
-  console.log(jsonJoke)
-  const joke = jsonJoke;
-  return joke;
+const fetchData = async () => {
+  const url = "/.netlify/functions/sheets";
+  const response = await fetch(url);
+  const data = await response.json();
+  return data;
 };
 
-const displayJoke = (jokeObject) => {
+const displayData = (data) => {
   const h1 = document.querySelector("h1");
-  h1.textContent = jokeObject.joke; // Accessing the 'joke' property of the joke object
+  // Assuming data is an array of arrays, and you want to display the first row's values
+  h1.textContent = data[0].join(', '); // This will display the array values as a comma-separated string
 };
 
-
-const refreshJoke = async () => {
-  const joke = await getRandomDadJoke();
-  displayJoke(joke);
+const refreshData = async () => {
+  const data = await fetchData();
+  displayData(data);
 };
 
-// load 1st joke
-refreshJoke();
+// Load initial data
+refreshData();
 
-setInterval(refreshJoke, 10000);
+setInterval(refreshData, 10000);
